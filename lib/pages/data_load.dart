@@ -36,7 +36,6 @@ class _DataLoadState extends State<DataLoad> {
     Response response = await get('https://db.ygoprodeck.com/api/v7/cardinfo.php');
     Map data = jsonDecode(response.body);
     List cards = data['data'];
-    for(int i=0;i<cards.length;i++)
-      print(cards[i]['name']);
+    
   }
 }
