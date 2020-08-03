@@ -84,11 +84,14 @@ class DatabaseHelper {
         '$colLinkBottom INTEGER,'
         '$colLinkBottomLeft INTEGER,'
         '$colLinkLeft INTEGER,'
-        '$colLinkTopLeft INTEGER'
+        '$colLinkTopLeft INTEGER,'
+        '$colPriceCardMarket FLOAT,'
+        '$colPriceTcgPlayer FLOAT,'
+        '$colPriceEbay FLOAT,'
+        '$colPriceAmazon FLOAT,'
+        '$colPriceCoolStuffInc FLOAT,'
+        '$colImageUrl TEXT,'
+        '$colImageUrlSmall TEXT'
         ')');
-  }
-
-  void showMessage(){
-    print('YUHUUUUU!!!');
   }
 }
