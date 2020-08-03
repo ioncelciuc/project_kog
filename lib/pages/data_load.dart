@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart';
+import 'package:project_kog/utils/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DataLoad extends StatefulWidget {
   @override
@@ -10,6 +11,8 @@ class DataLoad extends StatefulWidget {
 }
 
 class _DataLoadState extends State<DataLoad> {
+  DatabaseHelper databaseHelper = DatabaseHelper();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +22,8 @@ class _DataLoadState extends State<DataLoad> {
         children: <Widget>[
           SpinKitCircle(color: Colors.blue, size: 80),
           SizedBox(height: 30),
-          Text('This is a one-time process!', style: TextStyle(fontSize: 20, color: Colors.red)),
+          Text('This is a one-time process!',
+              style: TextStyle(fontSize: 20, color: Colors.red)),
           Text('Data loading, please wait...', style: TextStyle(fontSize: 20)),
         ],
       ),
@@ -32,10 +36,12 @@ class _DataLoadState extends State<DataLoad> {
     downloadData();
   }
 
-  Future<void> downloadData() async{
-    Response response = await get('https://db.ygoprodeck.com/api/v7/cardinfo.php');
+  Future<void> downloadData() async {
+    Response response =
+        await get('https://db.ygoprodeck.com/api/v7/cardinfo.php');
     Map data = jsonDecode(response.body);
     List cards = data['data'];
-    
+    final Database database = await databaseHelper.initializeDatabase();
+    databaseHelper.showMessage();
   }
 }
