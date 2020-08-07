@@ -1,4 +1,4 @@
-class Card {
+class YuGiOhCard {
   int _id;
   String _name;
   String _type;
@@ -11,25 +11,26 @@ class Card {
   String _archetype;
   int _scale;
   int _linkval;
-  bool _linkTop;
-  bool _linkTopRight;
-  bool _linkRight;
-  bool _linkBottomRight;
-  bool _linkBottom;
-  bool _linkBottomLeft;
-  bool _linkLeft;
-  bool _linkTopLeft;
+  int _linkTop;
+  int _linkTopRight;
+  int _linkRight;
+  int _linkBottomRight;
+  int _linkBottom;
+  int _linkBottomLeft;
+  int _linkLeft;
+  int _linkTopLeft;
   double _priceCardMarket;
   double _priceTcgPlayer;
   double _priceEbay;
   double _priceAmazon;
   double _priceCoolStuffInc;
-
+  int _banlistTcg;
+  int _banlistOcg;
   String _imageUrl;
   String _imageUrlSmall;
 
-  Card(this._id, this._name, this._type, this._desc, this._imageUrl,
-      this._imageUrlSmall, this._race,
+  YuGiOhCard.fullConstructor(this._id, this._name, this._type, this._desc,
+      this._imageUrl, this._imageUrlSmall, this._race,
       [this._atk,
       this._def,
       this._level,
@@ -49,7 +50,41 @@ class Card {
       this._priceTcgPlayer,
       this._priceEbay,
       this._priceAmazon,
-      this._priceCoolStuffInc]);
+      this._priceCoolStuffInc,
+      this._banlistTcg,
+      this._banlistOcg]);
+
+  YuGiOhCard() {
+    this._id = 0;
+    this._name = '';
+    this._type = '';
+    this._desc = '';
+    this._imageUrl = '';
+    this._imageUrlSmall = '';
+    this._race = '';
+    this._atk = 0;
+    this._def = 0;
+    this._level = 0;
+    this._attribute = '';
+    this._archetype = '';
+    this._scale = -1;
+    this._priceCardMarket = 0;
+    this._priceTcgPlayer = 0;
+    this._priceEbay = 0;
+    this._priceAmazon = 0;
+    this._priceCoolStuffInc = 0;
+    this._linkTop = 0;
+    this._linkTopRight = 0;
+    this._linkRight = 0;
+    this._linkBottomRight = 0;
+    this._linkBottom = 0;
+    this._linkBottomLeft = 0;
+    this._linkLeft = 0;
+    this._linkTopLeft = 0;
+    this._linkval = 0;
+    this._banlistTcg = 3;
+    this._banlistOcg = 3;
+  }
 
   String get imageUrlSmall => _imageUrlSmall;
 
@@ -61,6 +96,12 @@ class Card {
 
   set imageUrl(String value) {
     _imageUrl = value;
+  }
+
+  int get banlistTcg => _banlistTcg;
+
+  set banlistTcg(int value) {
+    _banlistTcg = value;
   }
 
   double get priceCoolStuffInc => _priceCoolStuffInc;
@@ -93,51 +134,51 @@ class Card {
     _priceCardMarket = value;
   }
 
-  bool get linkTopLeft => _linkTopLeft;
+  int get linkTopLeft => _linkTopLeft;
 
-  set linkTopLeft(bool value) {
+  set linkTopLeft(int value) {
     _linkTopLeft = value;
   }
 
-  bool get linkLeft => _linkLeft;
+  int get linkLeft => _linkLeft;
 
-  set linkLeft(bool value) {
+  set linkLeft(int value) {
     _linkLeft = value;
   }
 
-  bool get linkBottomLeft => _linkBottomLeft;
+  int get linkBottomLeft => _linkBottomLeft;
 
-  set linkBottomLeft(bool value) {
+  set linkBottomLeft(int value) {
     _linkBottomLeft = value;
   }
 
-  bool get linkBottom => _linkBottom;
+  int get linkBottom => _linkBottom;
 
-  set linkBottom(bool value) {
+  set linkBottom(int value) {
     _linkBottom = value;
   }
 
-  bool get linkBottomRight => _linkBottomRight;
+  int get linkBottomRight => _linkBottomRight;
 
-  set linkBottomRight(bool value) {
+  set linkBottomRight(int value) {
     _linkBottomRight = value;
   }
 
-  bool get linkRight => _linkRight;
+  int get linkRight => _linkRight;
 
-  set linkRight(bool value) {
+  set linkRight(int value) {
     _linkRight = value;
   }
 
-  bool get linkTopRight => _linkTopRight;
+  int get linkTopRight => _linkTopRight;
 
-  set linkTopRight(bool value) {
+  set linkTopRight(int value) {
     _linkTopRight = value;
   }
 
-  bool get linkTop => _linkTop;
+  int get linkTop => _linkTop;
 
-  set linkTop(bool value) {
+  set linkTop(int value) {
     _linkTop = value;
   }
 
@@ -213,7 +254,13 @@ class Card {
     _id = value;
   }
 
-  // Convert Card to Map
+  int get banlistOcg => _banlistOcg;
+
+  set banlistOcg(int value) {
+    _banlistOcg = value;
+  }
+
+  // Convert YuGiOhCard to Map
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = Map<String, dynamic>();
     map['id'] = this._id;
@@ -243,10 +290,13 @@ class Card {
     map['priceCoolStuffInc'] = this._priceCoolStuffInc;
     map['imageUrl'] = this._imageUrl;
     map['imageUrlSmall'] = this._imageUrlSmall;
+    map['banlistTcg'] = this._banlistTcg;
+    map['banlistOcg'] = this._banlistOcg;
+    return map;
   }
 
-  // Convert Map to Card
-  Card.fromMapToObject(Map<String, dynamic> map) {
+  // Convert Map to YuGiOhCard
+  YuGiOhCard.fromMapToObject(Map<String, dynamic> map) {
     this._id = map['id'];
     this._name = map['name'];
     this._type = map['type'];
@@ -274,5 +324,12 @@ class Card {
     this._priceCoolStuffInc = map['priceCoolStuffInc'];
     this._imageUrl = map['imageUrl'];
     this._imageUrlSmall = map['imageUrlSmall'];
+    this._banlistTcg = map['banlistTcg'];
+    this._banlistOcg = map['banlistOcg'];
+  }
+
+  @override
+  String toString() {
+    return '$_id\n$_name\n$_scale\n$_linkval\n$_linkLeft';
   }
 }
