@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kog/models/card.dart';
@@ -30,7 +31,7 @@ class _FragmentCardListState extends State<FragmentCardList> {
               ? 'SPELL / ${card.race}'
               : (card.type.contains('Trap')
                   ? 'TRAP / ${card.race}'
-                  : '${card.attribute.toUpperCase()} / ${card.race} / ${card.type.substring(0, card.type.lastIndexOf('Monster'))}'));
+                  : '${card.attribute.toUpperCase()} / ${card.race} / ${(card.type.contains('Monster') ? card.type.substring(0, card.type.lastIndexOf('Monster')) : card.type)}'));
           String stats = (card.attribute == ''
               ? ''
               : (card.type.contains('Link')
@@ -48,8 +49,10 @@ class _FragmentCardListState extends State<FragmentCardList> {
                 children: [
                   Expanded(
                     flex: 1,
-                    child: Image.network(
-                      card.imageUrlSmall,
+                    child: CachedNetworkImage(
+                      imageUrl: card.imageUrlSmall,
+                      placeholder: (context, url) => Image.asset('assets/card_back.jpg'),
+                      errorWidget: (context, url, error) => Image.asset('assets/card_back.jpg'),
                     ),
                   ),
                   Expanded(
