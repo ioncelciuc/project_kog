@@ -103,7 +103,7 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getAllCardsAsMaps() async{
     Database db = await instance.database;
-    return await db.query(tableCards);
+    return await db.rawQuery('SELECT * FROM $tableCards ORDER BY $colName asc');
   }
 
   Future<List<YuGiOhCard>> getAllCards() async{
