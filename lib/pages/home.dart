@@ -2,9 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/fragment_calculator.dart';
 import 'package:project_kog/fragments/fragment_favourites.dart';
-import 'package:project_kog/models/card.dart';
 import 'package:project_kog/pages/settings.dart';
-import 'package:project_kog/utils/database_helper.dart';
 
 import '../fragments/fragment_database.dart';
 
@@ -68,7 +66,7 @@ class _HomeState extends State<Home> {
           children: [
             UserAccountsDrawerHeader(
               accountName: Text(
-                'Yu-Gi-Oh! Companion App',
+                'Companion App',
                 style: TextStyle(fontSize: 20),
               ),
               accountEmail: Text('Still in development'),
