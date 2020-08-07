@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kog/models/card.dart';
 import 'package:project_kog/utils/database_helper.dart';
@@ -37,33 +38,40 @@ class _FragmentCardListState extends State<FragmentCardList> {
                   : (card.type.contains('Pendulum')
                       ? '${card.atk} / ${card.def} / SCALE ${card.scale}'
                       : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
-          return Container(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    Image.network(
+          return GestureDetector(
+            onTap: () {
+              //here things will happen
+            },
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Image.network(
                       card.imageUrlSmall,
                     ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      card.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          card.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 17,
+                          ),
+                        ),
+                        Text(generalInfo),
+                        Text(stats),
+                      ],
                     ),
-                    Text(generalInfo),
-                    Text(stats),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           );
         },
