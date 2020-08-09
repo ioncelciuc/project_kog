@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kog/models/card.dart';
+import 'package:project_kog/pages/card_detail.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
 class FragmentCardList extends StatefulWidget {
@@ -54,7 +55,7 @@ class _FragmentCardListState extends State<FragmentCardList>
                       : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
           return GestureDetector(
             onTap: () {
-              //here things will happen
+              Navigator.push(context, MaterialPageRoute(builder: (context) => CardDetail(card: cardList[index])));
             },
             child: IntrinsicHeight(
               child: Row(
