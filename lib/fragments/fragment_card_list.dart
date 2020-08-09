@@ -5,11 +5,21 @@ import 'package:project_kog/models/card.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
 class FragmentCardList extends StatefulWidget {
+  final String listType;
+
+  FragmentCardList({this.listType});
+
   @override
-  _FragmentCardListState createState() => _FragmentCardListState();
+  _FragmentCardListState createState() =>
+      _FragmentCardListState(listType: this.listType);
 }
 
-class _FragmentCardListState extends State<FragmentCardList> {
+class _FragmentCardListState extends State<FragmentCardList>
+    with AutomaticKeepAliveClientMixin<FragmentCardList> {
+  String listType;
+
+  _FragmentCardListState({this.listType});
+
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<YuGiOhCard> cardList;
   int count = 0;
@@ -17,8 +27,11 @@ class _FragmentCardListState extends State<FragmentCardList> {
   @override
   void initState() {
     super.initState();
-    getAllCardsFromDatabase();
+    getAllCardsFromDatabase(listType != null ? listType : 'null');
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +64,10 @@ class _FragmentCardListState extends State<FragmentCardList> {
                     flex: 1,
                     child: CachedNetworkImage(
                       imageUrl: card.imageUrlSmall,
-                      placeholder: (context, url) => Image.asset('assets/card_back.jpg'),
-                      errorWidget: (context, url, error) => Image.asset('assets/card_back.jpg'),
+                      placeholder: (context, url) =>
+                          Image.asset('assets/card_back.jpg'),
+                      errorWidget: (context, url, error) =>
+                          Image.asset('assets/card_back.jpg'),
                     ),
                   ),
                   Expanded(
@@ -82,8 +97,21 @@ class _FragmentCardListState extends State<FragmentCardList> {
     );
   }
 
-  void getAllCardsFromDatabase() async {
-    List<YuGiOhCard> futureList = await databaseHelper.getAllCards();
+  void getAllCardsFromDatabase(String listType) async {
+    List<YuGiOhCard> futureList;
+
+    switch (listType) {
+      case 'all_cards':
+        futureList = await databaseHelper.getAllCards();
+        break;
+      case 'banlist':
+        futureList = await databaseHelper.getAllBanlistCards();
+        break;
+      case 'null':
+        futureList = await databaseHelper.getAllCards();
+        break;
+    }
+
     setState(() {
       this.cardList = futureList;
       this.count = futureList.length;

@@ -15,30 +15,24 @@ class _FragmentDatabaseState extends State<FragmentDatabase> {
       body: DefaultTabController(
         length: 3,
         child: Scaffold(
-          appBar: new AppBar(
+          appBar: AppBar(
             actions: <Widget>[],
             title: TabBar(
               onTap: (index) {
                 print('You tapped at $index');
               },
               tabs: [
-                Tab(
-                  text: 'ALL CARDS',
-                ),
-                Tab(
-                  text: 'BANLIST',
-                ),
-                Tab(
-                  text: 'ARCHETYPES',
-                ),
+                Tab(text: 'ALL CARDS'),
+                Tab(text: 'BANLIST'),
+                Tab(text: 'ARCHETYPES'),
               ],
               indicatorColor: Theme.of(context).accentColor,
             ),
           ),
           body: new TabBarView(
             children: [
-              FragmentCardList(),
-              FragmentCardList(),
+              FragmentCardList(listType: 'all_cards'),
+              FragmentCardList(listType: 'banlist'),
               FragmentCardList(),
             ],
           ),

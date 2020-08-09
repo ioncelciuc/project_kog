@@ -115,6 +115,20 @@ class DatabaseHelper {
     return cardList;
   }
 
+  Future<List<Map<String, dynamic>>> getAllBanlistCardsAsMaps() async{
+    Database db = await instance.database;
+    return await db.rawQuery('SELECT * FROM $tableCards WHERE NOT $colBanlistTcg = 3 ORDER BY $colBanlistTcg, $colType, $colName');
+  }
+
+  Future<List<YuGiOhCard>> getAllBanlistCards() async{
+    var cardMapList = await getAllBanlistCardsAsMaps();
+    List<YuGiOhCard> cardList = List<YuGiOhCard>();
+    for(int i=0 ; i< cardMapList.length; i++){
+      cardList.add(YuGiOhCard.fromMapToObject(cardMapList[i]));
+    }
+    return cardList;
+  }
+
   Future<int> insertCard(YuGiOhCard card) async {
     Database db = await instance.database;
     return await db.insert(tableCards, card.toMap());
