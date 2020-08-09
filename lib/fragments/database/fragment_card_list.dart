@@ -53,42 +53,32 @@ class _FragmentCardListState extends State<FragmentCardList>
                   : (card.type.contains('Pendulum')
                       ? '${card.atk} / ${card.def} / SCALE ${card.scale}'
                       : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => CardDetail(card: cardList[index])));
-            },
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+          return Card(
+            elevation: 8,
+            child: ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CardDetail(card: cardList[index]),
+                  ),
+                );
+              },
+              selected: true,
+              contentPadding: EdgeInsets.only(left: 8, right: 8),
+              leading: CachedNetworkImage(
+                imageUrl: card.imageUrlSmall,
+                placeholder: (context, url) =>
+                    Image.asset('assets/card_back.jpg'),
+                errorWidget: (context, url, error) =>
+                    Image.asset('assets/card_back.jpg'),
+              ),
+              title: Text(card.name),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: CachedNetworkImage(
-                      imageUrl: card.imageUrlSmall,
-                      placeholder: (context, url) =>
-                          Image.asset('assets/card_back.jpg'),
-                      errorWidget: (context, url, error) =>
-                          Image.asset('assets/card_back.jpg'),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          card.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17,
-                          ),
-                        ),
-                        Text(generalInfo),
-                        Text(stats),
-                      ],
-                    ),
-                  ),
+                  Text(generalInfo),
+                  Text(stats),
                 ],
               ),
             ),
