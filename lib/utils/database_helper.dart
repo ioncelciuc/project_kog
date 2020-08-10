@@ -10,6 +10,7 @@ class DatabaseHelper {
   static final int _databaseVersion = 1;
 
   static final String tableCards = 'table_cards';
+  static final String tableFavourites = 'table_favourites';
   static final String colId = 'id';
   static final String colName = 'name';
   static final String colType = 'type';
@@ -39,6 +40,7 @@ class DatabaseHelper {
   static final String colImageUrlSmall = 'imageUrlSmall';
   static final String colBanlistTcg = 'banlistTcg';
   static final String colBanlistOcg = 'banlistOcg';
+  static final String colFavourite = 'favourite';
 
   // Make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -97,33 +99,73 @@ class DatabaseHelper {
         '$colPriceTcgPlayer FLOAT,'
         '$colPriceEbay FLOAT,'
         '$colPriceAmazon FLOAT,'
-        '$colPriceCoolStuffInc FLOAT'
+        '$colPriceCoolStuffInc FLOAT,'
+        '$colFavourite INTEGER'
+        ')');
+
+    await db.execute('CREATE TABLE $tableFavourites '
+        '('
+        '$colId INTEGER PRIMARY KEY,'
+        '$colName TEXT,'
+        '$colType TEXT,'
+        '$colDesc TEXT,'
+        '$colAtk INTEGER,'
+        '$colDef INTEGER,'
+        '$colLevel INTEGER,'
+        '$colRace TEXT,'
+        '$colAttribute TEXT,'
+        '$colArchetype TEXT,'
+        '$colScale INTEGER,'
+        '$colLinkval INTEGER,'
+        '$colLinkTop INTEGER,'
+        '$colLinkTopRight INTEGER,'
+        '$colLinkRight INTEGER,'
+        '$colLinkBottomRight INTEGER,'
+        '$colLinkBottom INTEGER,'
+        '$colLinkBottomLeft INTEGER,'
+        '$colLinkLeft INTEGER,'
+        '$colLinkTopLeft INTEGER,'
+        '$colImageUrl TEXT,'
+        '$colImageUrlSmall TEXT,'
+        '$colBanlistTcg INTEGER,'
+        '$colBanlistOcg INTEGER,'
+        '$colPriceCardMarket FLOAT,'
+        '$colPriceTcgPlayer FLOAT,'
+        '$colPriceEbay FLOAT,'
+        '$colPriceAmazon FLOAT,'
+        '$colPriceCoolStuffInc FLOAT,'
+        '$colFavourite INTEGER'
         ')');
   }
 
-  Future<List<Map<String, dynamic>>> getAllCardsAsMaps() async{
+  /// CUSTOM QUERY
+
+  Future<List<Map<String, dynamic>>> getAllBanlistCardsAsMaps() async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $tableCards ORDER BY $colName asc');
+    return await db.rawQuery(
+        'SELECT * FROM $tableCards WHERE NOT $colBanlistTcg = 3 ORDER BY $colBanlistTcg, $colType, $colName');
   }
 
-  Future<List<YuGiOhCard>> getAllCards() async{
-    var cardMapList = await getAllCardsAsMaps();
+  Future<List<YuGiOhCard>> getAllBanlistCards() async {
+    var cardMapList = await getAllBanlistCardsAsMaps();
     List<YuGiOhCard> cardList = List<YuGiOhCard>();
-    for(int i=0 ; i< cardMapList.length; i++){
+    for (int i = 0; i < cardMapList.length; i++) {
       cardList.add(YuGiOhCard.fromMapToObject(cardMapList[i]));
     }
     return cardList;
   }
 
-  Future<List<Map<String, dynamic>>> getAllBanlistCardsAsMaps() async{
+  /// REGULAR DATABASE
+
+  Future<List<Map<String, dynamic>>> getAllCardsAsMaps() async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $tableCards WHERE NOT $colBanlistTcg = 3 ORDER BY $colBanlistTcg, $colType, $colName');
+    return await db.rawQuery('SELECT * FROM $tableCards ORDER BY $colName asc');
   }
 
-  Future<List<YuGiOhCard>> getAllBanlistCards() async{
-    var cardMapList = await getAllBanlistCardsAsMaps();
+  Future<List<YuGiOhCard>> getAllCards() async {
+    var cardMapList = await getAllCardsAsMaps();
     List<YuGiOhCard> cardList = List<YuGiOhCard>();
-    for(int i=0 ; i< cardMapList.length; i++){
+    for (int i = 0; i < cardMapList.length; i++) {
       cardList.add(YuGiOhCard.fromMapToObject(cardMapList[i]));
     }
     return cardList;
@@ -133,5 +175,52 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.insert(tableCards, card.toMap());
   }
-  
+
+  Future<int> updateCard(YuGiOhCard card) async {
+    Database db = await instance.database;
+    return db.update(
+      tableCards,
+      card.toMap(),
+      where: '$colId = ?',
+      whereArgs: [card.id],
+    );
+  }
+
+  /// FAVOURITES
+
+  Future<List<Map<String, dynamic>>> getAllFavouriteCardsAsMaps() async {
+    Database db = await instance.database;
+    return await db.rawQuery('SELECT * FROM $tableFavourites ORDER BY $colName asc');
+  }
+
+  Future<List<YuGiOhCard>> getAllFavouriteCards() async {
+    var cardMapList = await getAllFavouriteCardsAsMaps();
+    List<YuGiOhCard> cardList = List<YuGiOhCard>();
+    for (int i = 0; i < cardMapList.length; i++) {
+      cardList.add(YuGiOhCard.fromMapToObject(cardMapList[i]));
+    }
+    return cardList;
+  }
+
+  Future<int> insertFavouriteCard(YuGiOhCard card) async {
+    Database db = await instance.database;
+    return await db.insert(tableFavourites, card.toMap());
+  }
+
+  Future<int> updateFavouriteCard(YuGiOhCard card) async {
+    Database db = await instance.database;
+    return db.update(
+      tableFavourites,
+      card.toMap(),
+      where: '$colId = ?',
+      whereArgs: [card.id],
+    );
+  }
+
+  Future<int> deleteFavouriteCard(int id) async {
+    Database db = await instance.database;
+    return await db
+        .rawDelete('DELETE FROM $tableFavourites WHERE $colId = $id');
+  }
+
 }

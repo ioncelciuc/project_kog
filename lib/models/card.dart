@@ -28,6 +28,7 @@ class YuGiOhCard {
   int _banlistOcg;
   String _imageUrl;
   String _imageUrlSmall;
+  int _favourite;
 
   YuGiOhCard.fullConstructor(this._id, this._name, this._type, this._desc,
       this._imageUrl, this._imageUrlSmall, this._race,
@@ -84,6 +85,13 @@ class YuGiOhCard {
     this._linkval = 0;
     this._banlistTcg = 3;
     this._banlistOcg = 3;
+    this._favourite = 0;
+  }
+
+  int get favourite => _favourite;
+
+  set favourite(int value) {
+    _favourite = value;
   }
 
   String get imageUrlSmall => _imageUrlSmall;
@@ -292,6 +300,7 @@ class YuGiOhCard {
     map['imageUrlSmall'] = this._imageUrlSmall;
     map['banlistTcg'] = this._banlistTcg;
     map['banlistOcg'] = this._banlistOcg;
+    map['favourite'] = this._favourite;
     return map;
   }
 
@@ -326,10 +335,6 @@ class YuGiOhCard {
     this._imageUrlSmall = map['imageUrlSmall'];
     this._banlistTcg = map['banlistTcg'];
     this._banlistOcg = map['banlistOcg'];
-  }
-
-  @override
-  String toString() {
-    return '$_id\n$_name\n$_scale\n$_linkval\n$_linkLeft';
+    this._favourite = map['favourite'];
   }
 }

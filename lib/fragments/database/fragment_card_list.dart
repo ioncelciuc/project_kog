@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:marquee_widget/marquee_widget.dart';
 import 'package:project_kog/models/card.dart';
 import 'package:project_kog/pages/card_detail.dart';
 import 'package:project_kog/utils/database_helper.dart';
@@ -36,6 +37,10 @@ class _FragmentCardListState extends State<FragmentCardList>
 
   @override
   Widget build(BuildContext context) {
+    Icon iconFavouriteBorder = Icon(Icons.favorite_border);
+    Icon iconFavourite = Icon(Icons.favorite);
+    Icon trailingIcon;
+
     return Scaffold(
       body: ListView.builder(
         itemCount: count,
@@ -53,6 +58,8 @@ class _FragmentCardListState extends State<FragmentCardList>
                   : (card.type.contains('Pendulum')
                       ? '${card.atk} / ${card.def} / SCALE ${card.scale}'
                       : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
+          trailingIcon =
+              (card.favourite == 0 ? iconFavouriteBorder : iconFavourite);
           return Card(
             elevation: 8,
             child: ListTile(
@@ -73,13 +80,42 @@ class _FragmentCardListState extends State<FragmentCardList>
                 errorWidget: (context, url, error) =>
                     Image.asset('assets/card_back.jpg'),
               ),
-              title: Text(card.name),
+              title: Marquee(
+                child: Text('${card.name}'),
+                pauseDuration: Duration(milliseconds: 1000),
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(generalInfo),
-                  Text(stats),
+                  Marquee(
+                    child: Text(generalInfo),
+                    pauseDuration: Duration(milliseconds: 500),
+                  ),
+                  Marquee(
+                    child: Text(stats),
+                    pauseDuration: Duration(milliseconds: 500),
+                  ),
                 ],
+              ),
+              trailing: GestureDetector(
+                child: trailingIcon,
+                onTap: () {
+                  if (card.favourite == 1) {
+                    card.favourite = 0;
+                    databaseHelper.updateCard(card);
+                    databaseHelper.deleteFavouriteCard(card.id);
+                  } else {
+                    card.favourite = 1;
+                    databaseHelper.updateCard(card);
+                    databaseHelper.insertFavouriteCard(cardList[index]);
+                  }
+                  setState(() {
+                    trailingIcon = (card.favourite == 0
+                        ? iconFavouriteBorder
+                        : iconFavourite);
+                    getAllCardsFromDatabase(listType);
+                  });
+                },
               ),
             ),
           );
@@ -98,14 +134,17 @@ class _FragmentCardListState extends State<FragmentCardList>
       case 'banlist':
         futureList = await databaseHelper.getAllBanlistCards();
         break;
+      case 'favourites':
+        futureList = await databaseHelper.getAllFavouriteCards();
+        break;
       case 'null':
         futureList = await databaseHelper.getAllCards();
         break;
     }
 
     setState(() {
-      this.cardList = futureList;
-      this.count = futureList.length;
+      this.cardList = futureList != null ? futureList : List<YuGiOhCard>();
+      this.count = futureList != null ? futureList.length : 0;
     });
   }
 }

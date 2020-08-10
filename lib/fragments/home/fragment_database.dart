@@ -32,7 +32,7 @@ class _FragmentDatabaseState extends State<FragmentDatabase> {
             children: [
               FragmentCardList(listType: 'all_cards'),
               FragmentCardList(listType: 'banlist'),
-              FragmentCardList(),
+              FragmentCardList(), // TODO: ADD ARCHETYPES
             ],
           ),
         ),
