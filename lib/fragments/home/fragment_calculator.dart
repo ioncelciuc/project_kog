@@ -19,6 +19,7 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 10,
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {

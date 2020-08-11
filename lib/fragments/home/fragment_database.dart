@@ -22,6 +22,7 @@ class _FragmentDatabaseState extends State<FragmentDatabase> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
+          elevation: 10,
           leading: IconButton(
             icon: Icon(Icons.menu),
             onPressed: () {

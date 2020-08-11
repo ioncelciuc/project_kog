@@ -96,17 +96,15 @@ class _FragmentCardListState extends State<FragmentCardList>
                 ),
               ],
             ),
-            trailing: GestureDetector(
-              child: trailingIcon,
-              onTap: () {
+            trailing: IconButton(
+              icon: trailingIcon,
+              onPressed: () {
                 if (card.favourite == 1) {
                   card.favourite = 0;
                   databaseHelper.updateCard(card);
-                  databaseHelper.deleteFavouriteCard(card.id);
                 } else {
                   card.favourite = 1;
                   databaseHelper.updateCard(card);
-                  databaseHelper.insertFavouriteCard(cardList[index]);
                 }
                 setState(() {
                   trailingIcon = (card.favourite == 0
