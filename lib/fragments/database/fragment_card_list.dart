@@ -41,86 +41,84 @@ class _FragmentCardListState extends State<FragmentCardList>
     Icon iconFavourite = Icon(Icons.favorite);
     Icon trailingIcon;
 
-    return Scaffold(
-      body: ListView.builder(
-        itemCount: count,
-        itemBuilder: (BuildContext context, int index) {
-          YuGiOhCard card = cardList[index];
-          String generalInfo = (card.type.contains('Spell')
-              ? 'SPELL / ${card.race}'
-              : (card.type.contains('Trap')
-                  ? 'TRAP / ${card.race}'
-                  : '${card.attribute.toUpperCase()} / ${card.race} / ${(card.type.contains('Monster') ? card.type.substring(0, card.type.lastIndexOf('Monster')) : card.type)}'));
-          String stats = (card.attribute == ''
-              ? ''
-              : (card.type.contains('Link')
-                  ? '${card.atk} / LINK-${card.linkval}'
-                  : (card.type.contains('Pendulum')
-                      ? '${card.atk} / ${card.def} / SCALE ${card.scale}'
-                      : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
-          trailingIcon =
-              (card.favourite == 0 ? iconFavouriteBorder : iconFavourite);
-          return Card(
-            elevation: 8,
-            child: ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CardDetail(card: cardList[index]),
-                  ),
-                );
-              },
-              selected: true,
-              contentPadding: EdgeInsets.only(left: 8, right: 8),
-              leading: CachedNetworkImage(
-                imageUrl: card.imageUrlSmall,
-                placeholder: (context, url) =>
-                    Image.asset('assets/card_back.jpg'),
-                errorWidget: (context, url, error) =>
-                    Image.asset('assets/card_back.jpg'),
-              ),
-              title: Marquee(
-                child: Text('${card.name}'),
-                pauseDuration: Duration(milliseconds: 1000),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Marquee(
-                    child: Text(generalInfo),
-                    pauseDuration: Duration(milliseconds: 500),
-                  ),
-                  Marquee(
-                    child: Text(stats),
-                    pauseDuration: Duration(milliseconds: 500),
-                  ),
-                ],
-              ),
-              trailing: GestureDetector(
-                child: trailingIcon,
-                onTap: () {
-                  if (card.favourite == 1) {
-                    card.favourite = 0;
-                    databaseHelper.updateCard(card);
-                    databaseHelper.deleteFavouriteCard(card.id);
-                  } else {
-                    card.favourite = 1;
-                    databaseHelper.updateCard(card);
-                    databaseHelper.insertFavouriteCard(cardList[index]);
-                  }
-                  setState(() {
-                    trailingIcon = (card.favourite == 0
-                        ? iconFavouriteBorder
-                        : iconFavourite);
-                    getAllCardsFromDatabase(listType);
-                  });
-                },
-              ),
+    return ListView.builder(
+      itemCount: count,
+      itemBuilder: (BuildContext context, int index) {
+        YuGiOhCard card = cardList[index];
+        String generalInfo = (card.type.contains('Spell')
+            ? 'SPELL / ${card.race}'
+            : (card.type.contains('Trap')
+                ? 'TRAP / ${card.race}'
+                : '${card.attribute.toUpperCase()} / ${card.race} / ${(card.type.contains('Monster') ? card.type.substring(0, card.type.lastIndexOf('Monster')) : card.type)}'));
+        String stats = (card.attribute == ''
+            ? ''
+            : (card.type.contains('Link')
+                ? '${card.atk} / LINK-${card.linkval}'
+                : (card.type.contains('Pendulum')
+                    ? '${card.atk} / ${card.def} / SCALE ${card.scale}'
+                    : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
+        trailingIcon =
+            (card.favourite == 0 ? iconFavouriteBorder : iconFavourite);
+        return Card(
+          elevation: 8,
+          child: ListTile(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CardDetail(card: cardList[index]),
+                ),
+              );
+            },
+            selected: true,
+            contentPadding: EdgeInsets.only(left: 8, right: 8),
+            leading: CachedNetworkImage(
+              imageUrl: card.imageUrlSmall,
+              placeholder: (context, url) =>
+                  Image.asset('assets/card_back.jpg'),
+              errorWidget: (context, url, error) =>
+                  Image.asset('assets/card_back.jpg'),
             ),
-          );
-        },
-      ),
+            title: Marquee(
+              child: Text('${card.name}'),
+              pauseDuration: Duration(milliseconds: 1000),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Marquee(
+                  child: Text(generalInfo),
+                  pauseDuration: Duration(milliseconds: 500),
+                ),
+                Marquee(
+                  child: Text(stats),
+                  pauseDuration: Duration(milliseconds: 500),
+                ),
+              ],
+            ),
+            trailing: GestureDetector(
+              child: trailingIcon,
+              onTap: () {
+                if (card.favourite == 1) {
+                  card.favourite = 0;
+                  databaseHelper.updateCard(card);
+                  databaseHelper.deleteFavouriteCard(card.id);
+                } else {
+                  card.favourite = 1;
+                  databaseHelper.updateCard(card);
+                  databaseHelper.insertFavouriteCard(cardList[index]);
+                }
+                setState(() {
+                  trailingIcon = (card.favourite == 0
+                      ? iconFavouriteBorder
+                      : iconFavourite);
+                  getAllCardsFromDatabase(listType);
+                });
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 

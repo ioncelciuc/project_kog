@@ -2,14 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
 
 class FragmentFavourites extends StatefulWidget {
+  final GlobalKey<ScaffoldState> homeScaffoldState;
+
+  FragmentFavourites({this.homeScaffoldState});
+
   @override
-  _FragmentFavouritesState createState() => _FragmentFavouritesState();
+  _FragmentFavouritesState createState() =>
+      _FragmentFavouritesState(homeScaffoldState: this.homeScaffoldState);
 }
 
 class _FragmentFavouritesState extends State<FragmentFavourites> {
+  final GlobalKey<ScaffoldState> homeScaffoldState;
+
+  _FragmentFavouritesState({this.homeScaffoldState});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            homeScaffoldState.currentState.openDrawer();
+          },
+        ),
+        title: Text('Favourites'),
+      ),
       body: FragmentCardList(listType: 'favourites'),
       floatingActionButton: FloatingActionButton(
         child: Icon(
