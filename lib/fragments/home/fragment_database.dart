@@ -32,7 +32,7 @@ class _FragmentDatabaseState extends State<FragmentDatabase> {
           title: Text('Database'),
           bottom: TabBar(
             onTap: (index) {
-              //print('You tapped at $index');
+              print(index);
             },
             tabs: [
               Tab(text: 'ALL CARDS'),

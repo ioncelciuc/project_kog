@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:project_kog/fragments/home/fragment_dashboard.dart';
 import 'file:///C:/Users/Ionut-Tiberiu/AndroidStudioProjects/FlutterApps/project_kog/lib/fragments/home/fragment_calculator.dart';
 import 'package:project_kog/fragments/home/fragment_favourites.dart';
 import 'package:project_kog/pages/settings.dart';
@@ -15,6 +16,7 @@ class DrawerItem {
 
 class Home extends StatefulWidget {
   final drawerItems = [
+    DrawerItem(title: 'DashBoard', icon: Icons.dashboard),
     DrawerItem(title: 'Database', icon: Icons.view_list),
     DrawerItem(title: 'Calculator', icon: Icons.computer),
     DrawerItem(title: 'Favourites', icon: Icons.favorite),
@@ -30,14 +32,13 @@ class _HomeState extends State<Home> {
   _getDrawerItemWidget(int pos, GlobalKey<ScaffoldState> homeScaffoldState) {
     switch (pos) {
       case 0:
-        return FragmentDatabase(homeScaffoldState: homeScaffoldState);
+        return FragmentDashboard(homeScaffoldState: homeScaffoldState);
       case 1:
-        return FragmentCalculator(homeScaffoldState: homeScaffoldState);
+        return FragmentDatabase(homeScaffoldState: homeScaffoldState);
       case 2:
+        return FragmentCalculator(homeScaffoldState: homeScaffoldState);
+      case 3:
         return FragmentFavourites(homeScaffoldState: homeScaffoldState);
-
-      default:
-        return Center(child: Text('ERROR', style: TextStyle(fontSize: 25)));
     }
   }
 
