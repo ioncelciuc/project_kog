@@ -6,21 +6,29 @@ import 'package:project_kog/models/card.dart';
 import 'package:project_kog/pages/card_detail.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
-class FragmentCardList extends StatefulWidget {
-  final String listType;
+class FragmentCardList extends StatefulWidget{
+  //0 => all cards
+  //1 => banlist
+  //-1 => favourites
+  //2 => inca nu stiu ce o sa mai lucrez pe aici...
+  final int listType;
+  final String searchParams;
 
-  FragmentCardList({this.listType});
+  FragmentCardList({this.listType, this.searchParams});
 
   @override
-  _FragmentCardListState createState() =>
-      _FragmentCardListState(listType: this.listType);
+  _FragmentCardListState createState() => _FragmentCardListState(
+        listType: this.listType,
+        searchParams: this.searchParams,
+      );
 }
 
 class _FragmentCardListState extends State<FragmentCardList>
-    with AutomaticKeepAliveClientMixin<FragmentCardList> {
-  String listType;
+    with AutomaticKeepAliveClientMixin<FragmentCardList>{
+  int listType;
+  String searchParams;
 
-  _FragmentCardListState({this.listType});
+  _FragmentCardListState({this.listType, this.searchParams});
 
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<YuGiOhCard> cardList;
@@ -29,7 +37,7 @@ class _FragmentCardListState extends State<FragmentCardList>
   @override
   void initState() {
     super.initState();
-    getAllCardsFromDatabase(listType != null ? listType : 'null');
+    getAllCardsFromDatabase(listType, searchParams);
   }
 
   @override
@@ -55,7 +63,7 @@ class _FragmentCardListState extends State<FragmentCardList>
             : (card.type.contains('Link')
                 ? '${card.atk} / LINK-${card.linkval}'
                 : (card.type.contains('Pendulum')
-                    ? '${card.atk} / ${card.def} / SCALE ${card.scale}'
+                    ? '${card.atk} / ${card.def} / LEVEL ${card.level} / SCALE ${card.scale}'
                     : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
         trailingIcon =
             (card.favourite == 0 ? iconFavouriteBorder : iconFavourite);
@@ -101,16 +109,17 @@ class _FragmentCardListState extends State<FragmentCardList>
               onPressed: () {
                 if (card.favourite == 1) {
                   card.favourite = 0;
-                  databaseHelper.updateCard(card);
+                  //databaseHelper.updateCard(card);
                 } else {
                   card.favourite = 1;
-                  databaseHelper.updateCard(card);
+                  //databaseHelper.updateCard(card);
                 }
                 setState(() {
                   trailingIcon = (card.favourite == 0
                       ? iconFavouriteBorder
                       : iconFavourite);
-                  getAllCardsFromDatabase(listType);
+                  databaseHelper.updateCard(card);
+                  getAllCardsFromDatabase(listType, searchParams);
                 });
               },
             ),
@@ -120,22 +129,45 @@ class _FragmentCardListState extends State<FragmentCardList>
     );
   }
 
-  void getAllCardsFromDatabase(String listType) async {
+  void getAllCardsFromDatabase(int listType, String searchParams) async {
     List<YuGiOhCard> futureList;
 
     switch (listType) {
-      case 'all_cards':
+      case 0:
         futureList = await databaseHelper.getAllCards();
         break;
-      case 'banlist':
+      case 1:
         futureList = await databaseHelper.getAllBanlistCards();
         break;
-      case 'favourites':
+      case -1:
         futureList = await databaseHelper.getAllFavouriteCards();
         break;
-      case 'null':
+      default:
         futureList = await databaseHelper.getAllCards();
         break;
+    }
+
+    if (searchParams != null && searchParams != '') {
+      List<YuGiOhCard> searchList = List<YuGiOhCard>();
+      for (int i = 0; i < futureList.length; i++) {
+        if (futureList[i]
+                .name
+                .toLowerCase()
+                .contains(searchParams.toLowerCase()) ||
+            futureList[i]
+                .desc
+                .toLowerCase()
+                .contains(searchParams.toLowerCase())) {
+          searchList.add(futureList[i]);
+        }
+      }
+
+      setState(() {
+        this.cardList = searchList != null ? searchList : List<YuGiOhCard>();
+        this.count = searchList != null ? searchList.length : 0;
+      });
+
+      return;
     }
 
     setState(() {

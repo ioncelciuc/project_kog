@@ -29,7 +29,7 @@ class _FragmentFavouritesState extends State<FragmentFavourites> {
         ),
         title: Text('Favourites'),
       ),
-      body: FragmentCardList(listType: 'favourites'),
+      body: FragmentCardList(listType: -1),
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
