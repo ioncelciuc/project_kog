@@ -21,7 +21,7 @@ class CardMainInfo extends StatelessWidget {
         : (card.type.contains('Link')
         ? '${card.atk} / LINK-${card.linkval}'
         : (card.type.contains('Pendulum')
-        ? '${card.atk} / ${card.def} / SCALE ${card.scale}'
+        ? '${card.atk} / ${card.def} / LEVEL ${card.level} / SCALE ${card.scale}'
         : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
 
     return Scaffold(

@@ -39,10 +39,8 @@ class _CardDetailState extends State<CardDetail> {
                 onPressed: () {
                   if (card.favourite == 1) {
                     card.favourite = 0;
-                    //databaseHelper.updateCard(card);
                   } else {
                     card.favourite = 1;
-                    //databaseHelper.updateCard(card);
                   }
                   setState(() {
                     trailingIcon = (card.favourite == 0

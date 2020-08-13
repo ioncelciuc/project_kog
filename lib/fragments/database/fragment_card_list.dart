@@ -70,13 +70,14 @@ class _FragmentCardListState extends State<FragmentCardList>
         return Card(
           elevation: 8,
           child: ListTile(
-            onTap: () {
-              Navigator.push(
+            onTap: () async{
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => CardDetail(card: cardList[index]),
                 ),
               );
+              getAllCardsFromDatabase(listType, searchParams);
             },
             selected: true,
             contentPadding: EdgeInsets.only(left: 8, right: 8),

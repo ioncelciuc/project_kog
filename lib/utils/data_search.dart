@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
+import 'package:project_kog/models/card.dart';
+import 'package:project_kog/utils/database_helper.dart';
 
 class DataSearch extends SearchDelegate<String> {
   int tabIndex = -1;
@@ -37,14 +39,12 @@ class DataSearch extends SearchDelegate<String> {
     'Search for cards!',
   ];
 
+  // TODO: SHOW LAST SEARCHES
   @override
   Widget buildSuggestions(BuildContext context) {
     //show last 5 searches
-    return ListView.builder(
-      itemCount: recentSearches.length,
-      itemBuilder: (context, index) => ListTile(
-        title: Text(recentSearches[index]),
-      ),
+    return Text(
+      'Show cards'
     );
   }
 

@@ -48,15 +48,12 @@ class _FragmentDatabaseState extends State<FragmentDatabase> with SingleTickerPr
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              showSearch(context: context, delegate: DataSearch());
+              showSearch(context: context, delegate: DataSearch(tabIndex: tabController.index));
             },
           ),
         ],
         bottom: TabBar(
           controller: tabController,
-          onTap: (index) {
-            print(index);
-          },
           tabs: [
             Tab(text: 'ALL CARDS'),
             Tab(text: 'BANLIST'),
@@ -67,8 +64,8 @@ class _FragmentDatabaseState extends State<FragmentDatabase> with SingleTickerPr
       body: TabBarView(
         controller: tabController,
         children: [
-          FragmentCardList(listType: tabController.index),
-          FragmentCardList(listType: tabController.index),
+          FragmentCardList(listType: 0),
+          FragmentCardList(listType: 1),
           FragmentCardList(), // TODO: ADD ARCHETYPES
         ],
       ),
