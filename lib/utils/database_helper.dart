@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:project_kog/models/archetype.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:project_kog/models/card.dart';
 
@@ -40,6 +41,9 @@ class DatabaseHelper {
   static final String colBanlistTcg = 'banlistTcg';
   static final String colBanlistOcg = 'banlistOcg';
   static final String colFavourite = 'favourite';
+
+  // only uses id and name
+  static final String tableArchetypes = 'table_archetypes';
 
   // Make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -101,6 +105,12 @@ class DatabaseHelper {
         '$colPriceCoolStuffInc FLOAT,'
         '$colFavourite INTEGER'
         ')');
+
+    await db.execute('CREATE TABLE $tableArchetypes '
+        '('
+        '$colId INTEGER PRIMARY KEY AUTOINCREMENT,'
+        '$colName TEXT'
+        ')');
   }
 
   /// CUSTOM QUERY
@@ -137,6 +147,22 @@ class DatabaseHelper {
     return cardList;
   }
 
+  // Get all cards specific to an archetype
+  Future<List<Map<String, dynamic>>> getAllArchetypeCardsAsMaps(String archetype) async {
+    Database db = await instance.database;
+    return await db.rawQuery(
+        'SELECT * FROM $tableCards WHERE $colArchetype = \'$archetype\' ORDER BY $colName ASC');
+  }
+
+  Future<List<YuGiOhCard>> getAllArchetypeCards(String archetype) async {
+    var cardMapList = await getAllArchetypeCardsAsMaps(archetype);
+    List<YuGiOhCard> cardList = List<YuGiOhCard>();
+    for (int i = 0; i < cardMapList.length; i++) {
+      cardList.add(YuGiOhCard.fromMapToObject(cardMapList[i]));
+    }
+    return cardList;
+  }
+
   /// REGULAR DATABASE
 
   Future<List<Map<String, dynamic>>> getAllCardsAsMaps() async {
@@ -166,5 +192,27 @@ class DatabaseHelper {
       where: '$colId = ?',
       whereArgs: [card.id],
     );
+  }
+
+  ///Archetypes database
+
+  Future<List<Map<String, dynamic>>> getAllArchetypesAsMaps() async {
+    Database db = await instance.database;
+    return await db
+        .rawQuery('SELECT * FROM $tableArchetypes ORDER BY $colName asc');
+  }
+
+  Future<List<Archetype>> getAllArchetypes() async {
+    var archetypesMapList = await getAllArchetypesAsMaps();
+    List<Archetype> archetypeList = List<Archetype>();
+    for (int i = 0; i < archetypesMapList.length; i++) {
+      archetypeList.add(Archetype.fromMapToObject(archetypesMapList[i]));
+    }
+    return archetypeList;
+  }
+
+  Future<int> insertArchetype(Archetype archetype) async {
+    Database db = await instance.database;
+    return await db.insert(tableArchetypes, archetype.toMap());
   }
 }

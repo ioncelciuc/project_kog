@@ -9,16 +9,18 @@ class FragmentCardList extends StatefulWidget {
   //0 => all cards
   //1 => banlist
   //-1 => favourites
-  //2 => inca nu stiu ce o sa mai lucrez pe aici...
+  //2 => cards specific to an archetype
   final int listType;
   final String searchParams;
+  final String archetype;
 
-  FragmentCardList({this.listType, this.searchParams});
+  FragmentCardList({this.listType, this.searchParams, this.archetype});
 
   @override
   _FragmentCardListState createState() => _FragmentCardListState(
         listType: this.listType,
         searchParams: this.searchParams,
+        archetype: this.archetype,
       );
 }
 
@@ -26,8 +28,9 @@ class _FragmentCardListState extends State<FragmentCardList>
     with AutomaticKeepAliveClientMixin<FragmentCardList> {
   int listType;
   String searchParams;
+  String archetype;
 
-  _FragmentCardListState({this.listType, this.searchParams});
+  _FragmentCardListState({this.listType, this.searchParams, this.archetype});
 
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<YuGiOhCard> cardList;
@@ -36,7 +39,7 @@ class _FragmentCardListState extends State<FragmentCardList>
   @override
   void initState() {
     super.initState();
-    getAllCardsFromDatabase(listType, searchParams);
+    getAllCardsFromDatabase(listType, searchParams, archetype);
   }
 
   @override
@@ -75,7 +78,7 @@ class _FragmentCardListState extends State<FragmentCardList>
                   builder: (context) => CardDetail(card: cardList[index]),
                 ),
               );
-              getAllCardsFromDatabase(listType, searchParams);
+              getAllCardsFromDatabase(listType, searchParams, archetype);
             },
             selected: true,
             contentPadding: EdgeInsets.only(left: 8, right: 8),
@@ -118,7 +121,7 @@ class _FragmentCardListState extends State<FragmentCardList>
                       ? iconFavouriteBorder
                       : iconFavourite);
                   databaseHelper.updateCard(card);
-                  getAllCardsFromDatabase(listType, searchParams);
+                  getAllCardsFromDatabase(listType, searchParams, archetype);
                 });
               },
             ),
@@ -128,7 +131,8 @@ class _FragmentCardListState extends State<FragmentCardList>
     );
   }
 
-  void getAllCardsFromDatabase(int listType, String searchParams) async {
+  void getAllCardsFromDatabase(
+      int listType, String searchParams, String archetype) async {
     List<YuGiOhCard> futureList;
 
     switch (listType) {
@@ -141,6 +145,9 @@ class _FragmentCardListState extends State<FragmentCardList>
       case -1:
         futureList = await databaseHelper.getAllFavouriteCards();
         break;
+      case 2:
+        futureList = await databaseHelper.getAllArchetypeCards(archetype);
+        break;
       default:
         futureList = await databaseHelper.getAllCards();
         break;
@@ -152,7 +159,8 @@ class _FragmentCardListState extends State<FragmentCardList>
         if (futureList[i]
                 .name
                 .toLowerCase()
-                .contains(searchParams.toLowerCase()) ||
+                .trim()
+                .contains(searchParams.toLowerCase().trim()) ||
             futureList[i]
                 .desc
                 .toLowerCase()

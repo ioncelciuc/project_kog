@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart';
+import 'package:project_kog/models/archetype.dart';
 import 'package:project_kog/models/card.dart';
 import 'package:project_kog/pages/home.dart';
 import 'package:project_kog/utils/database_helper.dart';
@@ -38,8 +39,9 @@ class _DataLoadState extends State<DataLoad> {
 
   void appOpened() async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    bool openedForTheFirstTime = sharedPreferences.getBool('OPENED_FOR_THE_FIRST_TIME') ?? true;
-    if(openedForTheFirstTime == true) {
+    bool openedForTheFirstTime =
+        sharedPreferences.getBool('OPENED_FOR_THE_FIRST_TIME') ?? true;
+    if (openedForTheFirstTime == true) {
       setState(() {
         widgetList = [
           SpinKitCircle(color: Colors.blue, size: 80),
@@ -53,7 +55,8 @@ class _DataLoadState extends State<DataLoad> {
       await downloadData();
       sharedPreferences.setBool('OPENED_FOR_THE_FIRST_TIME', false);
     }
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => Home()));
   }
 
   Future<void> downloadData() async {
@@ -154,6 +157,15 @@ class _DataLoadState extends State<DataLoad> {
       card.imageUrl = cards[i]['card_images'][0]['image_url'];
       card.imageUrlSmall = cards[i]['card_images'][0]['image_url_small'];
       await databaseHelper.insertCard(card);
+    }
+
+    //now download the archetypes
+    response = await get('https://db.ygoprodeck.com/api/v7/archetypes.php');
+    List archetypes = jsonDecode(response.body);
+    for (int i = 0; i < archetypes.length; i++) {
+      Archetype archetype = new Archetype();
+      archetype.name = archetypes[i]['archetype_name'];
+      await databaseHelper.insertArchetype(archetype);
     }
   }
 }

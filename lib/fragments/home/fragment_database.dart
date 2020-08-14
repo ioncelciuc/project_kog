@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kog/fragments/database/fragment_archetypes.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
 import 'package:project_kog/utils/data_search.dart';
 
@@ -66,7 +67,7 @@ class _FragmentDatabaseState extends State<FragmentDatabase> with SingleTickerPr
         children: [
           FragmentCardList(listType: 0),
           FragmentCardList(listType: 1),
-          FragmentCardList(), // TODO: ADD ARCHETYPES
+          FragmentArchetypes(),
         ],
       ),
     );
