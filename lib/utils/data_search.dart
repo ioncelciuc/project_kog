@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
 import 'package:project_kog/models/card.dart';
 import 'package:project_kog/utils/database_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DataSearch extends SearchDelegate<String> {
   int tabIndex = -1;
@@ -35,25 +36,26 @@ class DataSearch extends SearchDelegate<String> {
     );
   }
 
-  final recentSearches = [
-    'Search for cards!',
-  ];
-
   // TODO: SHOW LAST SEARCHES
   @override
   Widget buildSuggestions(BuildContext context) {
     //show last 5 searches
-    return Text(
-      'Show cards'
+    return ListView(
+      children: [],
     );
   }
 
   @override
-  Widget buildResults(BuildContext context){
+  Widget buildResults(BuildContext context) {
     //show result based on the selection
     return FragmentCardList(
       listType: tabIndex,
       searchParams: query,
     );
+  }
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    return Theme.of(context);
   }
 }

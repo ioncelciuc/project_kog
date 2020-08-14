@@ -1,12 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:project_kog/models/card.dart';
 import 'package:project_kog/pages/card_detail.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
-class FragmentCardList extends StatefulWidget{
+class FragmentCardList extends StatefulWidget {
   //0 => all cards
   //1 => banlist
   //-1 => favourites
@@ -24,7 +23,7 @@ class FragmentCardList extends StatefulWidget{
 }
 
 class _FragmentCardListState extends State<FragmentCardList>
-    with AutomaticKeepAliveClientMixin<FragmentCardList>{
+    with AutomaticKeepAliveClientMixin<FragmentCardList> {
   int listType;
   String searchParams;
 
@@ -48,7 +47,6 @@ class _FragmentCardListState extends State<FragmentCardList>
     Icon iconFavouriteBorder = Icon(Icons.favorite_border);
     Icon iconFavourite = Icon(Icons.favorite);
     Icon trailingIcon;
-
     return ListView.builder(
       itemCount: count,
       itemBuilder: (BuildContext context, int index) {
@@ -70,7 +68,7 @@ class _FragmentCardListState extends State<FragmentCardList>
         return Card(
           elevation: 8,
           child: ListTile(
-            onTap: () async{
+            onTap: () async {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
