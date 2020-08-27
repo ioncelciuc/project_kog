@@ -19,7 +19,7 @@ class DataSearch extends SearchDelegate<String> {
       )
     ];
   }
-
+  
   @override
   Widget buildLeading(BuildContext context) {
     //leading icon on the left of the app bar

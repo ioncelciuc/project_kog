@@ -68,62 +68,83 @@ class _FragmentCardListState extends State<FragmentCardList>
                     : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
         trailingIcon =
             (card.favourite == 0 ? iconFavouriteBorder : iconFavourite);
-        return Card(
-          elevation: 8,
-          child: ListTile(
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CardDetail(card: cardList[index]),
-                ),
-              );
-              getAllCardsFromDatabase(listType, searchParams, archetype);
-            },
-            selected: true,
-            contentPadding: EdgeInsets.only(left: 8, right: 8),
-            leading: CachedNetworkImage(
-              imageUrl: card.imageUrlSmall,
-              placeholder: (context, url) =>
-                  Image.asset('assets/card_back.jpg'),
-              errorWidget: (context, url, error) =>
-                  Image.asset('assets/card_back.jpg'),
-            ),
-            title: Marquee(
-              child: Text('${card.name}'),
-              pauseDuration: Duration(milliseconds: 1000),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        return GestureDetector(
+          onTap: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CardDetail(card: cardList[index]),
+              ),
+            );
+            getAllCardsFromDatabase(listType, searchParams, archetype);
+          },
+          onLongPress: () {
+            //add to favourites
+            //add to a deck
+          },
+          child: Container(
+            height: 86,
+            color: Colors.white,
+            child: Row(
               children: [
-                Marquee(
-                  child: Text(generalInfo),
-                  pauseDuration: Duration(milliseconds: 500),
+                CachedNetworkImage(
+                  height: 86,
+                  imageUrl: card.imageUrlSmall,
+                  placeholder: (context, url) =>
+                      Image.asset('assets/card_back.jpg'),
+                  errorWidget: (context, url, error) =>
+                      Image.asset('assets/card_back.jpg'),
                 ),
-                Marquee(
-                  child: Text(stats),
-                  pauseDuration: Duration(milliseconds: 500),
+                SizedBox(
+                  width: 10,
                 ),
+                Flexible(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Marquee(
+                        child: Text(
+                          '${card.name}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        pauseDuration: Duration(milliseconds: 500),
+                      ),
+                      Marquee(
+                        child: Text(generalInfo),
+                        pauseDuration: Duration(milliseconds: 500),
+                      ),
+                      Marquee(
+                        child: Text(stats),
+                        pauseDuration: Duration(milliseconds: 500),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                )
+                //TODO: IMPLEMENT ADD TO FAVOURITES DIALOG
+//                IconButton(
+//                  icon: trailingIcon,
+//                  onPressed: () {
+//                    if (card.favourite == 1) {
+//                      card.favourite = 0;
+//                      //databaseHelper.updateCard(card);
+//                    } else {
+//                      card.favourite = 1;
+//                      //databaseHelper.updateCard(card);
+//                    }
+//                    setState(() {
+//                      trailingIcon = (card.favourite == 0
+//                          ? iconFavouriteBorder
+//                          : iconFavourite);
+//                      databaseHelper.updateCard(card);
+//                      getAllCardsFromDatabase(listType, searchParams, archetype);
+//                    });
+//                  },
+//                ),
               ],
-            ),
-            trailing: IconButton(
-              icon: trailingIcon,
-              onPressed: () {
-                if (card.favourite == 1) {
-                  card.favourite = 0;
-                  //databaseHelper.updateCard(card);
-                } else {
-                  card.favourite = 1;
-                  //databaseHelper.updateCard(card);
-                }
-                setState(() {
-                  trailingIcon = (card.favourite == 0
-                      ? iconFavouriteBorder
-                      : iconFavourite);
-                  databaseHelper.updateCard(card);
-                  getAllCardsFromDatabase(listType, searchParams, archetype);
-                });
-              },
             ),
           ),
         );
