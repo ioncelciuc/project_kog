@@ -22,31 +22,35 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
   int lpPlayer1 = 8000;
   int lpPlayer2 = 8000;
   int selectedContainer = 0;
+  List<int> first = [8000];
+  List<int> second = [8000];
 
-  Widget buildButton(String text, Color chosenColor) {
+  Widget buildButton(String text, Color chosenColor, Border chosenBorder) {
     return Expanded(
-      child: FlatButton(
-        onPressed: () => buttonPressed(text),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0),
-          side: BorderSide(color: Colors.black),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+      child: Container(
+        decoration: BoxDecoration(border: chosenBorder),
+        child: FlatButton(
+          onPressed: () => buttonPressed(text),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
           ),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          color: chosenColor,
+          textColor: Colors.white,
         ),
-        color: chosenColor,
-        textColor: Colors.white,
       ),
     );
   }
 
   void buttonPressed(String text) {
     if (text.contains('Turn')) {
-      //advance in turn
+      //TODO: ADVANCE IN TURN AND UPDATE LOG
       return;
     }
     switch (text) {
@@ -106,8 +110,22 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         });
         break;
       case 'Log':
+        //TODO: LP LOG
         break;
       case 'Undo':
+        setState(() {
+          if (selectedContainer == 1) {
+            if (first.length > 1) {
+              first.removeLast();
+              lpPlayer1 = first.last;
+            }
+          } else if (selectedContainer == 2) {
+            if (second.length > 1) {
+              second.removeLast();
+              lpPlayer2 = second.last;
+            }
+          }
+        });
         break;
       case '⌫':
         setState(() {
@@ -119,18 +137,26 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
             ? lpToCalculate ~/= lpToSubstract
             : lpToCalculate;
         setState(() {
-          if (selectedContainer == 1)
+          if (selectedContainer == 1) {
             lpPlayer1 = lpToCalculate;
-          else if (selectedContainer == 2) lpPlayer2 = lpToCalculate;
+            first.add(lpToCalculate);
+          } else if (selectedContainer == 2) {
+            lpPlayer2 = lpToCalculate;
+            second.add(lpToCalculate);
+          }
           lpToSubstract = 0;
         });
         break;
       case '×':
         lpToCalculate = lpToCalculate * lpToSubstract;
         setState(() {
-          if (selectedContainer == 1)
+          if (selectedContainer == 1) {
             lpPlayer1 = lpToCalculate;
-          else if (selectedContainer == 2) lpPlayer2 = lpToCalculate;
+            first.add(lpToCalculate);
+          } else if (selectedContainer == 2) {
+            lpPlayer2 = lpToCalculate;
+            second.add(lpToCalculate);
+          }
           lpToSubstract = 0;
         });
         break;
@@ -138,27 +164,39 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         lpToCalculate = lpToCalculate - lpToSubstract;
         if (lpToCalculate < 0) lpToCalculate = 0;
         setState(() {
-          if (selectedContainer == 1)
+          if (selectedContainer == 1) {
             lpPlayer1 = lpToCalculate;
-          else if (selectedContainer == 2) lpPlayer2 = lpToCalculate;
+            first.add(lpToCalculate);
+          } else if (selectedContainer == 2) {
+            lpPlayer2 = lpToCalculate;
+            second.add(lpToCalculate);
+          }
           lpToSubstract = 0;
         });
         break;
       case '+':
         lpToCalculate = lpToCalculate + lpToSubstract;
         setState(() {
-          if (selectedContainer == 1)
+          if (selectedContainer == 1) {
             lpPlayer1 = lpToCalculate;
-          else if (selectedContainer == 2) lpPlayer2 = lpToCalculate;
+            first.add(lpToCalculate);
+          } else if (selectedContainer == 2) {
+            lpPlayer2 = lpToCalculate;
+            second.add(lpToCalculate);
+          }
           lpToSubstract = 0;
         });
         break;
       case '=':
         lpToCalculate = lpToSubstract;
         setState(() {
-          if (selectedContainer == 1)
+          if (selectedContainer == 1) {
             lpPlayer1 = lpToCalculate;
-          else if (selectedContainer == 2) lpPlayer2 = lpToCalculate;
+            first.add(lpToCalculate);
+          } else if (selectedContainer == 2) {
+            lpPlayer2 = lpToCalculate;
+            second.add(lpToCalculate);
+          }
           lpToSubstract = 0;
         });
         break;
@@ -183,18 +221,19 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         actions: [
           IconButton(
             onPressed: () {
-              //da cu zarul
+              //TODO: DICE!
             },
             icon: Icon(DiceIcon.perspective_dice_one),
           ),
           IconButton(
             onPressed: () {
               setState(() {
-                lpToCalculate = 0;
-                lpToSubstract = 0;
-                lpPlayer1 = 8000;
-                lpPlayer2 = 8000;
-                selectedContainer = 0;
+                lpToCalculate = lpToSubstract = selectedContainer = 0;
+                lpPlayer1 = lpPlayer2 = 8000;
+                first.clear();
+                first.add(8000);
+                second.clear();
+                second.add(8000);
               });
             },
             icon: Icon(Icons.refresh),
@@ -326,10 +365,39 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      buildButton('Turn 1', Colors.grey),
-                      buildButton('Log', Colors.grey),
-                      buildButton('Undo', Colors.grey),
-                      buildButton('⌫', Colors.red),
+                      buildButton(
+                        'Turn 1',
+                        Theme.of(context).primaryColorDark,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        'Log',
+                        Theme.of(context).primaryColorDark,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        'Undo',
+                        Theme.of(context).primaryColorDark,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '⌫',
+                        Theme.of(context).accentColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          right: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -338,10 +406,39 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      buildButton('7', Colors.grey),
-                      buildButton('8', Colors.grey),
-                      buildButton('9', Colors.grey),
-                      buildButton('÷', Colors.black54),
+                      buildButton(
+                        '7',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '8',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '9',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '÷',
+                        Theme.of(context).primaryColorDark,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          right: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -350,10 +447,39 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      buildButton('4', Colors.grey),
-                      buildButton('5', Colors.grey),
-                      buildButton('6', Colors.grey),
-                      buildButton('×', Colors.black54),
+                      buildButton(
+                        '4',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '5',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '6',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '×',
+                        Theme.of(context).primaryColorDark,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          right: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -362,10 +488,39 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      buildButton('1', Colors.grey),
-                      buildButton('2', Colors.grey),
-                      buildButton('3', Colors.grey),
-                      buildButton('-', Colors.black54),
+                      buildButton(
+                        '1',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '2',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '3',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '-',
+                        Theme.of(context).primaryColorDark,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          right: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -374,10 +529,43 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      buildButton('00', Colors.grey),
-                      buildButton('0', Colors.grey),
-                      buildButton('=', Colors.black54),
-                      buildButton('+', Colors.black54),
+                      buildButton(
+                        '00',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          bottom: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '0',
+                        Theme.of(context).primaryColor,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          bottom: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '=',
+                        Theme.of(context).primaryColorDark,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          bottom: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
+                      buildButton(
+                        '+',
+                        Theme.of(context).primaryColorDark,
+                        Border(
+                          top: BorderSide(color: Colors.black, width: 1),
+                          right: BorderSide(color: Colors.black, width: 1),
+                          bottom: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
                     ],
                   ),
                 ),
