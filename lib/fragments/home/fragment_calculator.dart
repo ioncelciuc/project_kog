@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kog/icons/dice_icon_icons.dart';
@@ -118,11 +120,13 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
             if (first.length > 1) {
               first.removeLast();
               lpPlayer1 = first.last;
+              lpToCalculate = first.last;
             }
           } else if (selectedContainer == 2) {
             if (second.length > 1) {
               second.removeLast();
               lpPlayer2 = second.last;
+              lpToCalculate = second.last;
             }
           }
         });
@@ -133,19 +137,19 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         });
         break;
       case '÷':
-        lpToCalculate = lpToSubstract != 0
-            ? lpToCalculate ~/= lpToSubstract
-            : lpToCalculate;
-        setState(() {
-          if (selectedContainer == 1) {
-            lpPlayer1 = lpToCalculate;
-            first.add(lpToCalculate);
-          } else if (selectedContainer == 2) {
-            lpPlayer2 = lpToCalculate;
-            second.add(lpToCalculate);
-          }
-          lpToSubstract = 0;
-        });
+        if (lpToSubstract != 0) {
+          lpToCalculate = lpToCalculate ~/= lpToSubstract;
+          setState(() {
+            if (selectedContainer == 1) {
+              lpPlayer1 = lpToCalculate;
+              first.add(lpToCalculate);
+            } else if (selectedContainer == 2) {
+              lpPlayer2 = lpToCalculate;
+              second.add(lpToCalculate);
+            }
+            lpToSubstract = 0;
+          });
+        }
         break;
       case '×':
         lpToCalculate = lpToCalculate * lpToSubstract;
@@ -161,31 +165,35 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         });
         break;
       case '-':
-        lpToCalculate = lpToCalculate - lpToSubstract;
-        if (lpToCalculate < 0) lpToCalculate = 0;
-        setState(() {
-          if (selectedContainer == 1) {
-            lpPlayer1 = lpToCalculate;
-            first.add(lpToCalculate);
-          } else if (selectedContainer == 2) {
-            lpPlayer2 = lpToCalculate;
-            second.add(lpToCalculate);
-          }
-          lpToSubstract = 0;
-        });
+        if (lpToSubstract != 0) {
+          lpToCalculate = lpToCalculate - lpToSubstract;
+          if (lpToCalculate < 0) lpToCalculate = 0;
+          setState(() {
+            if (selectedContainer == 1) {
+              lpPlayer1 = lpToCalculate;
+              first.add(lpToCalculate);
+            } else if (selectedContainer == 2) {
+              lpPlayer2 = lpToCalculate;
+              second.add(lpToCalculate);
+            }
+            lpToSubstract = 0;
+          });
+        }
         break;
       case '+':
-        lpToCalculate = lpToCalculate + lpToSubstract;
-        setState(() {
-          if (selectedContainer == 1) {
-            lpPlayer1 = lpToCalculate;
-            first.add(lpToCalculate);
-          } else if (selectedContainer == 2) {
-            lpPlayer2 = lpToCalculate;
-            second.add(lpToCalculate);
-          }
-          lpToSubstract = 0;
-        });
+        if (lpToSubstract != 0) {
+          lpToCalculate = lpToCalculate + lpToSubstract;
+          setState(() {
+            if (selectedContainer == 1) {
+              lpPlayer1 = lpToCalculate;
+              first.add(lpToCalculate);
+            } else if (selectedContainer == 2) {
+              lpPlayer2 = lpToCalculate;
+              second.add(lpToCalculate);
+            }
+            lpToSubstract = 0;
+          });
+        }
         break;
       case '=':
         lpToCalculate = lpToSubstract;
@@ -221,7 +229,11 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         actions: [
           IconButton(
             onPressed: () {
-              //TODO: DICE!
+              showDialog(
+                context: context,
+                builder: (_) => DiceDialog(),
+                barrierDismissible: true,
+              );
             },
             icon: Icon(DiceIcon.perspective_dice_one),
           ),
@@ -574,6 +586,58 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
           )
         ],
       ),
+    );
+  }
+}
+
+class DiceDialog extends StatefulWidget {
+  @override
+  _DiceDialogState createState() => _DiceDialogState();
+}
+
+class _DiceDialogState extends State<DiceDialog> {
+  @override
+  Widget build(BuildContext context) {
+    int diceNumber = Random().nextInt(6) + 1;
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+      ),
+      elevation: 11,
+      content: Container(
+        child: Image.asset(
+          'assets/dice$diceNumber.png',
+          color: Theme.of(context).primaryColorDark,
+        ),
+      ),
+      actions: [
+        FlatButton(
+          hoverColor: Theme.of(context).accentColor,
+          splashColor: Theme.of(context).accentColor,
+          highlightColor: Theme.of(context).accentColor,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: Theme.of(context).primaryColorDark),
+          ),
+        ),
+        FlatButton(
+          hoverColor: Theme.of(context).accentColor,
+          splashColor: Theme.of(context).accentColor,
+          highlightColor: Theme.of(context).accentColor,
+          onPressed: () {
+            setState(() {
+              diceNumber = Random().nextInt(6) + 1;
+            });
+          },
+          child: Text(
+            'Roll',
+            style: TextStyle(color: Theme.of(context).primaryColorDark),
+          ),
+        )
+      ],
     );
   }
 }
