@@ -1,8 +1,8 @@
 import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kog/icons/dice_icon_icons.dart';
+import 'package:project_kog/models/log.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FragmentCalculator extends StatefulWidget {
   final GlobalKey<ScaffoldState> homeScaffoldState;
@@ -21,11 +21,12 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
 
   int lpToCalculate = 0;
   int lpToSubstract = 0;
-  int lpPlayer1 = 8000;
-  int lpPlayer2 = 8000;
+  int lpPlayer1;
+  int lpPlayer2;
   int selectedContainer = 0;
-  List<int> first = [8000];
-  List<int> second = [8000];
+  Log first;
+  Log second;
+  int turn;
 
   Widget buildButton(String text, Color chosenColor, Border chosenBorder) {
     return Expanded(
@@ -52,7 +53,9 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
 
   void buttonPressed(String text) {
     if (text.contains('Turn')) {
-      //TODO: ADVANCE IN TURN AND UPDATE LOG
+      setState(() {
+        turn++;
+      });
       return;
     }
     switch (text) {
@@ -111,22 +114,22 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
           lpToSubstract = lpToSubstract * 10 + 9;
         });
         break;
-      case 'Log':
-        //TODO: LP LOG
+      case 'Coin':
+        showDialog(context: context, builder: (_) => CoinDialog());
         break;
       case 'Undo':
         setState(() {
           if (selectedContainer == 1) {
-            if (first.length > 1) {
-              first.removeLast();
-              lpPlayer1 = first.last;
-              lpToCalculate = first.last;
+            if (first.stack.length > 1) {
+              first.stack.removeLast();
+              lpPlayer1 = first.stack.last;
+              lpToCalculate = first.stack.last;
             }
           } else if (selectedContainer == 2) {
-            if (second.length > 1) {
-              second.removeLast();
-              lpPlayer2 = second.last;
-              lpToCalculate = second.last;
+            if (second.stack.length > 1) {
+              second.stack.removeLast();
+              lpPlayer2 = second.stack.last;
+              lpToCalculate = second.stack.last;
             }
           }
         });
@@ -142,10 +145,10 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
           setState(() {
             if (selectedContainer == 1) {
               lpPlayer1 = lpToCalculate;
-              first.add(lpToCalculate);
+              first.stack.add(lpToCalculate);
             } else if (selectedContainer == 2) {
               lpPlayer2 = lpToCalculate;
-              second.add(lpToCalculate);
+              second.stack.add(lpToCalculate);
             }
             lpToSubstract = 0;
           });
@@ -156,10 +159,10 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         setState(() {
           if (selectedContainer == 1) {
             lpPlayer1 = lpToCalculate;
-            first.add(lpToCalculate);
+            first.stack.add(lpToCalculate);
           } else if (selectedContainer == 2) {
             lpPlayer2 = lpToCalculate;
-            second.add(lpToCalculate);
+            second.stack.add(lpToCalculate);
           }
           lpToSubstract = 0;
         });
@@ -171,10 +174,10 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
           setState(() {
             if (selectedContainer == 1) {
               lpPlayer1 = lpToCalculate;
-              first.add(lpToCalculate);
+              first.stack.add(lpToCalculate);
             } else if (selectedContainer == 2) {
               lpPlayer2 = lpToCalculate;
-              second.add(lpToCalculate);
+              second.stack.add(lpToCalculate);
             }
             lpToSubstract = 0;
           });
@@ -186,10 +189,10 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
           setState(() {
             if (selectedContainer == 1) {
               lpPlayer1 = lpToCalculate;
-              first.add(lpToCalculate);
+              first.stack.add(lpToCalculate);
             } else if (selectedContainer == 2) {
               lpPlayer2 = lpToCalculate;
-              second.add(lpToCalculate);
+              second.stack.add(lpToCalculate);
             }
             lpToSubstract = 0;
           });
@@ -200,15 +203,98 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         setState(() {
           if (selectedContainer == 1) {
             lpPlayer1 = lpToCalculate;
-            first.add(lpToCalculate);
+            first.stack.add(lpToCalculate);
           } else if (selectedContainer == 2) {
             lpPlayer2 = lpToCalculate;
-            second.add(lpToCalculate);
+            second.stack.add(lpToCalculate);
           }
           lpToSubstract = 0;
         });
         break;
     }
+  }
+
+  Widget buildResetDialog() {
+    return AlertDialog(
+      title: Text(
+        'Reset LP and number of turns?',
+        style: TextStyle(color: Theme.of(context).primaryColor),
+      ),
+      actions: [
+        FlatButton(
+          hoverColor: Theme.of(context).accentColor,
+          splashColor: Theme.of(context).accentColor,
+          highlightColor: Theme.of(context).accentColor,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+        ),
+        FlatButton(
+          hoverColor: Theme.of(context).accentColor,
+          splashColor: Theme.of(context).accentColor,
+          highlightColor: Theme.of(context).accentColor,
+          onPressed: () {
+            setState(() {
+              lpToCalculate = lpToSubstract = selectedContainer = 0;
+              lpPlayer1 = lpPlayer2 = 8000;
+              first.stack.clear();
+              first.stack.add(8000);
+              second.stack.clear();
+              second.stack.add(8000);
+              turn = 1;
+              saveChanges();
+            });
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'Yes',
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    callOnInitState();
+    super.initState();
+  }
+
+  void callOnInitState() async {
+    first = Log();
+    second = Log();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      lpPlayer1 = sharedPreferences.getInt('lpPlayer1') ?? 8000;
+      lpPlayer2 = sharedPreferences.getInt('lpPlayer2') ?? 8000;
+      turn = sharedPreferences.getInt('turn') ?? 1;
+      selectedContainer = sharedPreferences.getInt('selectedContainer') ?? 0;
+      first.getStackFromStringList(
+          sharedPreferences.getStringList('first') ?? ['8000']);
+      second.getStackFromStringList(
+          sharedPreferences.getStringList('second') ?? ['8000']);
+    });
+  }
+
+  @override
+  void dispose() {
+    saveChanges();
+    super.dispose();
+  }
+
+  void saveChanges() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setInt('lpPlayer1', lpPlayer1);
+    await sharedPreferences.setInt('lpPlayer2', lpPlayer2);
+    await sharedPreferences.setInt('turn', turn);
+    await sharedPreferences.setInt('selectedContainer', selectedContainer);
+    await sharedPreferences.setStringList('first', first.toStringList());
+    await sharedPreferences.setStringList('second', second.toStringList());
   }
 
   @override
@@ -229,6 +315,12 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
         actions: [
           IconButton(
             onPressed: () {
+              saveChanges();
+            },
+            icon: Icon(Icons.save),
+          ),
+          IconButton(
+            onPressed: () {
               showDialog(
                 context: context,
                 builder: (_) => DiceDialog(),
@@ -239,14 +331,7 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
           ),
           IconButton(
             onPressed: () {
-              setState(() {
-                lpToCalculate = lpToSubstract = selectedContainer = 0;
-                lpPlayer1 = lpPlayer2 = 8000;
-                first.clear();
-                first.add(8000);
-                second.clear();
-                second.add(8000);
-              });
+              showDialog(context: context, builder: (_) => buildResetDialog());
             },
             icon: Icon(Icons.refresh),
           ),
@@ -290,7 +375,7 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                               ),
                             ),
                             Text(
-                              '$lpPlayer1',
+                              lpPlayer1 != null ? '$lpPlayer1' : '',
                               style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
@@ -334,7 +419,7 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                               ),
                             ),
                             Text(
-                              '$lpPlayer2',
+                              lpPlayer2 != null ? '$lpPlayer2' : '',
                               style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
@@ -378,7 +463,7 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       buildButton(
-                        'Turn 1',
+                        turn != null ? 'Turn $turn' : 'Turn  ',
                         Theme.of(context).primaryColorDark,
                         Border(
                           top: BorderSide(color: Colors.black, width: 1),
@@ -386,7 +471,7 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
                         ),
                       ),
                       buildButton(
-                        'Log',
+                        'Coin',
                         Theme.of(context).primaryColorDark,
                         Border(
                           top: BorderSide(color: Colors.black, width: 1),
@@ -600,14 +685,14 @@ class _DiceDialogState extends State<DiceDialog> {
   Widget build(BuildContext context) {
     int diceNumber = Random().nextInt(6) + 1;
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-      ),
+//      shape: RoundedRectangleBorder(
+//        borderRadius: BorderRadius.all(Radius.circular(5)),
+//      ),
       elevation: 11,
       content: Container(
         child: Image.asset(
           'assets/dice$diceNumber.png',
-          color: Theme.of(context).primaryColorDark,
+          color: Theme.of(context).primaryColor,
         ),
       ),
       actions: [
@@ -620,7 +705,7 @@ class _DiceDialogState extends State<DiceDialog> {
           },
           child: Text(
             'Cancel',
-            style: TextStyle(color: Theme.of(context).primaryColorDark),
+            style: TextStyle(color: Theme.of(context).primaryColor),
           ),
         ),
         FlatButton(
@@ -634,7 +719,54 @@ class _DiceDialogState extends State<DiceDialog> {
           },
           child: Text(
             'Roll',
-            style: TextStyle(color: Theme.of(context).primaryColorDark),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class CoinDialog extends StatefulWidget {
+  @override
+  _CoinDialogState createState() => _CoinDialogState();
+}
+
+class _CoinDialogState extends State<CoinDialog> {
+  int coin = Random().nextInt(2) + 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      elevation: 11,
+      content: Container(
+        child: Image.asset('assets/coin$coin.png'),
+      ),
+      actions: [
+        FlatButton(
+          hoverColor: Theme.of(context).accentColor,
+          splashColor: Theme.of(context).accentColor,
+          highlightColor: Theme.of(context).accentColor,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+        ),
+        FlatButton(
+          hoverColor: Theme.of(context).accentColor,
+          splashColor: Theme.of(context).accentColor,
+          highlightColor: Theme.of(context).accentColor,
+          onPressed: () {
+            setState(() {
+              coin = Random().nextInt(2) + 1;
+            });
+          },
+          child: Text(
+            'Flip',
+            style: TextStyle(color: Theme.of(context).primaryColor),
           ),
         )
       ],
