@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:project_kog/models/archetype.dart';
+import 'package:project_kog/models/deck.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:project_kog/models/card.dart';
 
@@ -44,6 +45,9 @@ class DatabaseHelper {
 
   // only uses id and name
   static final String tableArchetypes = 'table_archetypes';
+
+  // only uses id and name
+  static final String tableDecks = 'table_decks';
 
   // Make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -111,6 +115,12 @@ class DatabaseHelper {
         '$colId INTEGER PRIMARY KEY AUTOINCREMENT,'
         '$colName TEXT'
         ')');
+
+    await db.execute('CREATE TABLE $tableDecks'
+        '('
+        '$colId INTEGER PRIMARY KEY AUTOINCREMENT,'
+        '$colName TEXT'
+        ')');
   }
 
   /// CUSTOM QUERY
@@ -148,7 +158,8 @@ class DatabaseHelper {
   }
 
   // Get all cards specific to an archetype
-  Future<List<Map<String, dynamic>>> getAllArchetypeCardsAsMaps(String archetype) async {
+  Future<List<Map<String, dynamic>>> getAllArchetypeCardsAsMaps(
+      String archetype) async {
     Database db = await instance.database;
     return await db.rawQuery(
         'SELECT * FROM $tableCards WHERE $colArchetype = \'$archetype\' ORDER BY $colName ASC');
@@ -215,4 +226,59 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.insert(tableArchetypes, archetype.toMap());
   }
+
+  ///Decks Database
+  Future<List<Map<String, dynamic>>> getAllDecksAsMaps() async {
+    Database db = await instance.database;
+    return await db.rawQuery('SELECT * FROM $tableDecks ORDER BY $colName asc');
+  }
+
+  Future<List<Deck>> getAllDecks() async {
+    var decksMapList = await getAllDecksAsMaps();
+    List<Deck> decksList = List<Deck>();
+    for (int i = 0; i < decksMapList.length; i++) {
+      decksList.add(Deck.fromMapToObject(decksMapList[i]));
+    }
+    return decksList;
+  }
+
+  Future<int> insertDeck(Deck deck) async {
+    Database db = await instance.database;
+    await db.execute('CREATE TABLE ${deck.name} '
+        '('
+        '$colId INTEGER PRIMARY KEY,'
+        '$colName TEXT,'
+        '$colType TEXT,'
+        '$colDesc TEXT,'
+        '$colAtk INTEGER,'
+        '$colDef INTEGER,'
+        '$colLevel INTEGER,'
+        '$colRace TEXT,'
+        '$colAttribute TEXT,'
+        '$colArchetype TEXT,'
+        '$colScale INTEGER,'
+        '$colLinkval INTEGER,'
+        '$colLinkTop INTEGER,'
+        '$colLinkTopRight INTEGER,'
+        '$colLinkRight INTEGER,'
+        '$colLinkBottomRight INTEGER,'
+        '$colLinkBottom INTEGER,'
+        '$colLinkBottomLeft INTEGER,'
+        '$colLinkLeft INTEGER,'
+        '$colLinkTopLeft INTEGER,'
+        '$colImageUrl TEXT,'
+        '$colImageUrlSmall TEXT,'
+        '$colBanlistTcg INTEGER,'
+        '$colBanlistOcg INTEGER,'
+        '$colPriceCardMarket FLOAT,'
+        '$colPriceTcgPlayer FLOAT,'
+        '$colPriceEbay FLOAT,'
+        '$colPriceAmazon FLOAT,'
+        '$colPriceCoolStuffInc FLOAT,'
+        '$colFavourite INTEGER'
+        ')');
+    return await db.insert(tableDecks, deck.toMap());
+  }
+
+  //TODO: GET DECK USING SELECTED TABLE NAME AS PARAMETER
 }

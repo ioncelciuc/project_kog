@@ -47,9 +47,6 @@ class _FragmentCardListState extends State<FragmentCardList>
 
   @override
   Widget build(BuildContext context) {
-    Icon iconFavouriteBorder = Icon(Icons.favorite_border);
-    Icon iconFavourite = Icon(Icons.favorite);
-    Icon trailingIcon;
     return ListView.builder(
       itemCount: count,
       itemBuilder: (BuildContext context, int index) {
@@ -66,8 +63,6 @@ class _FragmentCardListState extends State<FragmentCardList>
                 : (card.type.contains('Pendulum')
                     ? '${card.atk} / ${card.def} / LEVEL ${card.level} / SCALE ${card.scale}'
                     : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
-        trailingIcon =
-            (card.favourite == 0 ? iconFavouriteBorder : iconFavourite);
         return GestureDetector(
           onTap: () async {
             await Navigator.push(
@@ -76,11 +71,17 @@ class _FragmentCardListState extends State<FragmentCardList>
                 builder: (context) => CardDetail(card: cardList[index]),
               ),
             );
-            getAllCardsFromDatabase(listType, searchParams, archetype);
+            if (listType == -1)
+              getAllCardsFromDatabase(listType, searchParams, archetype);
           },
-          onLongPress: () {
-            //add to favourites
-            //add to a deck
+          onLongPress: () async {
+            await showDialog(
+              context: context,
+              builder: (_) =>
+                  AddToFavouritesOrDeckDialog(card: cardList[index]),
+            );
+            if (listType == -1)
+              getAllCardsFromDatabase(listType, searchParams, archetype);
           },
           child: Container(
             height: 86,
@@ -98,7 +99,7 @@ class _FragmentCardListState extends State<FragmentCardList>
                 SizedBox(
                   width: 10,
                 ),
-                Flexible(
+                Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,27 +124,27 @@ class _FragmentCardListState extends State<FragmentCardList>
                 ),
                 SizedBox(
                   width: 10,
-                )
-                //TODO: IMPLEMENT ADD TO FAVOURITES DIALOG
-//                IconButton(
-//                  icon: trailingIcon,
-//                  onPressed: () {
-//                    if (card.favourite == 1) {
-//                      card.favourite = 0;
-//                      //databaseHelper.updateCard(card);
-//                    } else {
-//                      card.favourite = 1;
-//                      //databaseHelper.updateCard(card);
-//                    }
-//                    setState(() {
-//                      trailingIcon = (card.favourite == 0
-//                          ? iconFavouriteBorder
-//                          : iconFavourite);
-//                      databaseHelper.updateCard(card);
-//                      getAllCardsFromDatabase(listType, searchParams, archetype);
-//                    });
-//                  },
-//                ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        await showDialog(
+                          context: context,
+                          builder: (_) => AddToFavouritesOrDeckDialog(
+                              card: cardList[index]),
+                        );
+                        if (listType == -1)
+                          getAllCardsFromDatabase(
+                              listType, searchParams, archetype);
+                      },
+                      icon: Icon(Icons.more_vert),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -202,5 +203,87 @@ class _FragmentCardListState extends State<FragmentCardList>
       this.cardList = futureList != null ? futureList : List<YuGiOhCard>();
       this.count = futureList != null ? futureList.length : 0;
     });
+  }
+}
+
+class AddToFavouritesOrDeckDialog extends StatefulWidget {
+  final YuGiOhCard card;
+
+  AddToFavouritesOrDeckDialog({this.card});
+
+  @override
+  _AddToFavouritesOrDeckDialogState createState() =>
+      _AddToFavouritesOrDeckDialogState(card: this.card);
+}
+
+class _AddToFavouritesOrDeckDialogState
+    extends State<AddToFavouritesOrDeckDialog> {
+  YuGiOhCard card;
+
+  _AddToFavouritesOrDeckDialogState({this.card});
+
+  final DatabaseHelper databaseHelper = DatabaseHelper.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    Icon iconFavouriteBorder = Icon(Icons.favorite_border);
+    Icon iconFavourite = Icon(
+      Icons.favorite,
+      color: Colors.red,
+    );
+
+    Icon leadingIcon =
+        card.favourite == 0 ? iconFavouriteBorder : iconFavourite;
+
+    return AlertDialog(
+      title: Text('Add card to favourite list or to a deck!'),
+      content: Container(
+        child: ListTile(
+          title: Text(
+            'Add to favourites',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          leading: IconButton(
+            icon: leadingIcon,
+            onPressed: () async {
+              if (card.favourite == 1)
+                card.favourite = 0;
+              else
+                card.favourite = 1;
+              setState(() {
+                leadingIcon =
+                    card.favourite == 0 ? iconFavouriteBorder : iconFavourite;
+              });
+              await databaseHelper.updateCard(card);
+            },
+          ),
+          onTap: () async {
+            if (card.favourite == 1)
+              card.favourite = 0;
+            else
+              card.favourite = 1;
+            setState(() {
+              leadingIcon =
+                  (card.favourite == 0 ? iconFavouriteBorder : iconFavourite);
+            });
+            await databaseHelper.updateCard(card);
+          },
+        ),
+      ),
+      actions: [
+        FlatButton(
+          hoverColor: Theme.of(context).accentColor,
+          splashColor: Theme.of(context).accentColor,
+          highlightColor: Theme.of(context).accentColor,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+        ),
+      ],
+    );
   }
 }

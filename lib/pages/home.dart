@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/home/fragment_dashboard.dart';
+import 'package:project_kog/fragments/home/fragment_decks.dart';
 import 'file:///C:/Users/Ionut-Tiberiu/AndroidStudioProjects/FlutterApps/project_kog/lib/fragments/home/fragment_calculator.dart';
 import 'package:project_kog/fragments/home/fragment_favourites.dart';
 import 'package:project_kog/pages/settings.dart';
@@ -20,6 +21,7 @@ class Home extends StatefulWidget {
     DrawerItem(title: 'Database', icon: Icons.view_list),
     DrawerItem(title: 'Calculator', icon: Icons.computer),
     DrawerItem(title: 'Favourites', icon: Icons.favorite),
+    DrawerItem(title: 'My Decks', icon: Icons.business_center),
   ];
 
   @override
@@ -39,6 +41,8 @@ class _HomeState extends State<Home> {
         return FragmentCalculator(homeScaffoldState: homeScaffoldState);
       case 3:
         return FragmentFavourites(homeScaffoldState: homeScaffoldState);
+      case 4:
+        return FragmentDecks(homeScaffoldState: homeScaffoldState);
     }
   }
 
