@@ -19,7 +19,8 @@ class FragmentCardList extends StatefulWidget {
   final String archetype;
   final Deck deck;
 
-  FragmentCardList({this.listType, this.searchParams, this.archetype, this.deck});
+  FragmentCardList(
+      {this.listType, this.searchParams, this.archetype, this.deck});
 
   @override
   _FragmentCardListState createState() => _FragmentCardListState(
@@ -37,7 +38,8 @@ class _FragmentCardListState extends State<FragmentCardList>
   String archetype;
   final Deck deck;
 
-  _FragmentCardListState({this.listType, this.searchParams, this.archetype, this.deck});
+  _FragmentCardListState(
+      {this.listType, this.searchParams, this.archetype, this.deck});
 
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<YuGiOhCard> cardList;
@@ -54,6 +56,12 @@ class _FragmentCardListState extends State<FragmentCardList>
 
   @override
   Widget build(BuildContext context) {
+    Icon iconFavouriteBorder = Icon(Icons.favorite_border);
+    Icon iconFavourite = Icon(
+      Icons.favorite,
+      color: Colors.red,
+    );
+
     return ListView.builder(
       itemCount: count,
       itemBuilder: (BuildContext context, int index) {
@@ -77,15 +85,6 @@ class _FragmentCardListState extends State<FragmentCardList>
               MaterialPageRoute(
                 builder: (context) => CardDetail(card: cardList[index]),
               ),
-            );
-            if (listType == -1)
-              getAllCardsFromDatabase(listType, searchParams, archetype);
-          },
-          onLongPress: () async {
-            await showDialog(
-              context: context,
-              builder: (_) =>
-                  AddToFavouritesOrDeckDialog(card: cardList[index]),
             );
             if (listType == -1)
               getAllCardsFromDatabase(listType, searchParams, archetype);
@@ -138,17 +137,21 @@ class _FragmentCardListState extends State<FragmentCardList>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     IconButton(
+                      icon: card.favourite == 0
+                          ? iconFavouriteBorder
+                          : iconFavourite,
                       onPressed: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (_) => AddToFavouritesOrDeckDialog(
-                              card: cardList[index]),
-                        );
+                        setState(() {
+                          if (card.favourite == 1)
+                            card.favourite = 0;
+                          else
+                            card.favourite = 1;
+                        });
+                        databaseHelper.updateCard(card);
                         if (listType == -1)
                           getAllCardsFromDatabase(
                               listType, searchParams, archetype);
                       },
-                      icon: Icon(Icons.more_vert),
                     ),
                   ],
                 ),
@@ -178,13 +181,16 @@ class _FragmentCardListState extends State<FragmentCardList>
         futureList = await databaseHelper.getAllArchetypeCards(archetype);
         break;
       case 3:
-        futureList = await databaseHelper.getAllCardsRelatedToDeck(deck, 'main');
+        futureList =
+            await databaseHelper.getAllCardsRelatedToDeck(deck, 'main');
         break;
       case 4:
-        futureList = await databaseHelper.getAllCardsRelatedToDeck(deck, 'extra');
+        futureList =
+            await databaseHelper.getAllCardsRelatedToDeck(deck, 'extra');
         break;
       case 5:
-        futureList = await databaseHelper.getAllCardsRelatedToDeck(deck, 'side');
+        futureList =
+            await databaseHelper.getAllCardsRelatedToDeck(deck, 'side');
         break;
       default:
         futureList = await databaseHelper.getAllCards();
@@ -218,112 +224,6 @@ class _FragmentCardListState extends State<FragmentCardList>
     setState(() {
       this.cardList = futureList != null ? futureList : List<YuGiOhCard>();
       this.count = futureList != null ? futureList.length : 0;
-    });
-  }
-}
-
-class AddToFavouritesOrDeckDialog extends StatefulWidget {
-  final YuGiOhCard card;
-
-  AddToFavouritesOrDeckDialog({this.card});
-
-  @override
-  _AddToFavouritesOrDeckDialogState createState() =>
-      _AddToFavouritesOrDeckDialogState(card: this.card);
-}
-
-class _AddToFavouritesOrDeckDialogState
-    extends State<AddToFavouritesOrDeckDialog> {
-  YuGiOhCard card;
-
-  _AddToFavouritesOrDeckDialogState({this.card});
-
-  final DatabaseHelper databaseHelper = DatabaseHelper.instance;
-
-  List<Deck> deckList;
-  int count;
-  List<int> cardInDeck;
-
-  @override
-  void initState() {
-    getAllDecksFromDatabase();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Icon iconFavouriteBorder = Icon(Icons.favorite_border);
-    Icon iconFavourite = Icon(
-      Icons.favorite,
-      color: Colors.red,
-    );
-
-    Icon leadingIcon =
-        card.favourite == 0 ? iconFavouriteBorder : iconFavourite;
-
-    return AlertDialog(
-      title: Text('Add card to favourite list or to a deck!'),
-      content: Container(
-        child: Card(
-          elevation: 10,
-          child: ListTile(
-            title: Text(
-              'Add to favourites',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            leading: IconButton(
-              icon: leadingIcon,
-              onPressed: () async {
-                if (card.favourite == 1)
-                  card.favourite = 0;
-                else
-                  card.favourite = 1;
-                setState(() {
-                  leadingIcon = card.favourite == 0
-                      ? iconFavouriteBorder
-                      : iconFavourite;
-                });
-                await databaseHelper.updateCard(card);
-              },
-            ),
-            onTap: () async {
-              if (card.favourite == 1)
-                card.favourite = 0;
-              else
-                card.favourite = 1;
-              setState(() {
-                leadingIcon = (card.favourite == 0
-                    ? iconFavouriteBorder
-                    : iconFavourite);
-              });
-              await databaseHelper.updateCard(card);
-            },
-          ),
-        ),
-      ),
-      actions: [
-        FlatButton(
-          hoverColor: Theme.of(context).accentColor,
-          splashColor: Theme.of(context).accentColor,
-          highlightColor: Theme.of(context).accentColor,
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text(
-            'Cancel',
-            style: TextStyle(color: Theme.of(context).primaryColor),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void getAllDecksFromDatabase() async {
-    List<Deck> futureList;
-    futureList = await databaseHelper.getAllDecks();
-    setState(() {
-      deckList = futureList != null ? futureList : List<Deck>();
-      count = futureList != null ? futureList.length : 0;
     });
   }
 }
