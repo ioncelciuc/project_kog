@@ -29,6 +29,9 @@ class YuGiOhCard {
   String _imageUrl;
   String _imageUrlSmall;
   int _favourite;
+  int _main;
+  int _extra;
+  int _side;
 
   YuGiOhCard.fullConstructor(this._id, this._name, this._type, this._desc,
       this._imageUrl, this._imageUrlSmall, this._race,
@@ -53,7 +56,11 @@ class YuGiOhCard {
       this._priceAmazon,
       this._priceCoolStuffInc,
       this._banlistTcg,
-      this._banlistOcg]);
+      this._banlistOcg,
+      this._favourite,
+      this._main,
+      this._extra,
+      this._side]);
 
   YuGiOhCard() {
     this._id = 0;
@@ -86,6 +93,16 @@ class YuGiOhCard {
     this._banlistTcg = 3;
     this._banlistOcg = 3;
     this._favourite = 0;
+    this._main = 0;
+    this._extra = 0;
+    this._side = 0;
+  }
+
+
+  int get main => _main;
+
+  set main(int value) {
+    _main = value;
   }
 
   int get favourite => _favourite;
@@ -268,6 +285,18 @@ class YuGiOhCard {
     _banlistOcg = value;
   }
 
+  int get extra => _extra;
+
+  set extra(int value) {
+    _extra = value;
+  }
+
+  int get side => _side;
+
+  set side(int value) {
+    _side = value;
+  }
+
   // Convert YuGiOhCard to Map
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = Map<String, dynamic>();
@@ -301,6 +330,9 @@ class YuGiOhCard {
     map['banlistTcg'] = this._banlistTcg;
     map['banlistOcg'] = this._banlistOcg;
     map['favourite'] = this._favourite;
+    map['main'] = this._main;
+    map['extra'] = this._extra;
+    map['side'] = this._side;
     return map;
   }
 
@@ -336,5 +368,8 @@ class YuGiOhCard {
     this._banlistTcg = map['banlistTcg'];
     this._banlistOcg = map['banlistOcg'];
     this._favourite = map['favourite'];
+    this._main = map['main'];
+    this._extra = map['extra'];
+    this._side = map['side'];
   }
 }

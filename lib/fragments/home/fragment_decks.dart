@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/models/deck.dart';
+import 'package:project_kog/pages/deck_page.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
 class FragmentDecks extends StatefulWidget {
@@ -87,7 +88,7 @@ class _FragmentDecksState extends State<FragmentDecks> {
             }
           },
           child: Text(
-            'Yes',
+            'Accept',
             style: TextStyle(color: Theme.of(context).primaryColor),
           ),
         ),
@@ -97,8 +98,8 @@ class _FragmentDecksState extends State<FragmentDecks> {
 
   @override
   void initState() {
-    super.initState();
     getAllDecksFromDatabase();
+    super.initState();
   }
 
   @override
@@ -121,9 +122,16 @@ class _FragmentDecksState extends State<FragmentDecks> {
               elevation: 5,
               child: ListTile(
                 onTap: () {
-                  //TODO: OPEN A NEW PAGE
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => DeckPage(deck: deckList[index])));
                 },
                 title: Text('${deckList[index].name}'),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () async {
+                    await databaseHelper.deleteDeck(deckList[index]);
+                    getAllDecksFromDatabase();
+                  },
+                ),
               ),
             );
           }),

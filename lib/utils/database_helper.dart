@@ -42,6 +42,9 @@ class DatabaseHelper {
   static final String colBanlistTcg = 'banlistTcg';
   static final String colBanlistOcg = 'banlistOcg';
   static final String colFavourite = 'favourite';
+  static final String colMain = 'main';
+  static final String colExtra = 'extra';
+  static final String colSide = 'side';
 
   // only uses id and name
   static final String tableArchetypes = 'table_archetypes';
@@ -107,7 +110,10 @@ class DatabaseHelper {
         '$colPriceEbay FLOAT,'
         '$colPriceAmazon FLOAT,'
         '$colPriceCoolStuffInc FLOAT,'
-        '$colFavourite INTEGER'
+        '$colFavourite INTEGER,'
+        '$colMain INTEGER,'
+        '$colExtra INTEGER,'
+        '$colSide INTEGER'
         ')');
 
     await db.execute('CREATE TABLE $tableArchetypes '
@@ -244,7 +250,7 @@ class DatabaseHelper {
 
   Future<int> insertDeck(Deck deck) async {
     Database db = await instance.database;
-    await db.execute('CREATE TABLE ${deck.name} '
+    await db.execute('CREATE TABLE ${deck.name}main '
         '('
         '$colId INTEGER PRIMARY KEY,'
         '$colName TEXT,'
@@ -275,9 +281,106 @@ class DatabaseHelper {
         '$colPriceEbay FLOAT,'
         '$colPriceAmazon FLOAT,'
         '$colPriceCoolStuffInc FLOAT,'
-        '$colFavourite INTEGER'
+        '$colFavourite INTEGER,'
+        '$colMain INTEGER,'
+        '$colExtra INTEGER,'
+        '$colSide INTEGER'
+        ')');
+    await db.execute('CREATE TABLE ${deck.name}extra '
+        '('
+        '$colId INTEGER PRIMARY KEY,'
+        '$colName TEXT,'
+        '$colType TEXT,'
+        '$colDesc TEXT,'
+        '$colAtk INTEGER,'
+        '$colDef INTEGER,'
+        '$colLevel INTEGER,'
+        '$colRace TEXT,'
+        '$colAttribute TEXT,'
+        '$colArchetype TEXT,'
+        '$colScale INTEGER,'
+        '$colLinkval INTEGER,'
+        '$colLinkTop INTEGER,'
+        '$colLinkTopRight INTEGER,'
+        '$colLinkRight INTEGER,'
+        '$colLinkBottomRight INTEGER,'
+        '$colLinkBottom INTEGER,'
+        '$colLinkBottomLeft INTEGER,'
+        '$colLinkLeft INTEGER,'
+        '$colLinkTopLeft INTEGER,'
+        '$colImageUrl TEXT,'
+        '$colImageUrlSmall TEXT,'
+        '$colBanlistTcg INTEGER,'
+        '$colBanlistOcg INTEGER,'
+        '$colPriceCardMarket FLOAT,'
+        '$colPriceTcgPlayer FLOAT,'
+        '$colPriceEbay FLOAT,'
+        '$colPriceAmazon FLOAT,'
+        '$colPriceCoolStuffInc FLOAT,'
+        '$colFavourite INTEGER,'
+        '$colMain INTEGER,'
+        '$colExtra INTEGER,'
+        '$colSide INTEGER'
+        ')');
+    await db.execute('CREATE TABLE ${deck.name}side '
+        '('
+        '$colId INTEGER PRIMARY KEY,'
+        '$colName TEXT,'
+        '$colType TEXT,'
+        '$colDesc TEXT,'
+        '$colAtk INTEGER,'
+        '$colDef INTEGER,'
+        '$colLevel INTEGER,'
+        '$colRace TEXT,'
+        '$colAttribute TEXT,'
+        '$colArchetype TEXT,'
+        '$colScale INTEGER,'
+        '$colLinkval INTEGER,'
+        '$colLinkTop INTEGER,'
+        '$colLinkTopRight INTEGER,'
+        '$colLinkRight INTEGER,'
+        '$colLinkBottomRight INTEGER,'
+        '$colLinkBottom INTEGER,'
+        '$colLinkBottomLeft INTEGER,'
+        '$colLinkLeft INTEGER,'
+        '$colLinkTopLeft INTEGER,'
+        '$colImageUrl TEXT,'
+        '$colImageUrlSmall TEXT,'
+        '$colBanlistTcg INTEGER,'
+        '$colBanlistOcg INTEGER,'
+        '$colPriceCardMarket FLOAT,'
+        '$colPriceTcgPlayer FLOAT,'
+        '$colPriceEbay FLOAT,'
+        '$colPriceAmazon FLOAT,'
+        '$colPriceCoolStuffInc FLOAT,'
+        '$colFavourite INTEGER,'
+        '$colMain INTEGER,'
+        '$colExtra INTEGER,'
+        '$colSide INTEGER'
         ')');
     return await db.insert(tableDecks, deck.toMap());
+  }
+
+  Future<int> deleteDeck(Deck deck) async{
+    Database db = await instance.database;
+    await db.execute('DROP TABLE IF EXISTS ${deck.name}main');
+    await db.execute('DROP TABLE IF EXISTS ${deck.name}extra');
+    await db.execute('DROP TABLE IF EXISTS ${deck.name}side');
+    return await db.rawDelete('DELETE FROM $tableDecks WHERE $colId = ${deck.id}');
+  }
+
+  Future<List<Map<String, dynamic>>> getAllCardsRelatedToDeckAsMaps(Deck deck, String deckType) async {
+    Database db = await instance.database;
+    return await db.rawQuery('SELECT * FROM ${deck.name}$deckType ORDER BY $colType asc');
+  }
+
+  Future<List<YuGiOhCard>> getAllCardsRelatedToDeck(Deck deck, String deckType) async {
+    var cardMapList = await getAllCardsRelatedToDeckAsMaps(deck, deckType);
+    List<YuGiOhCard> cardList = List<YuGiOhCard>();
+    for (int i = 0; i < cardMapList.length; i++) {
+      cardList.add(YuGiOhCard.fromMapToObject(cardMapList[i]));
+    }
+    return cardList;
   }
 
   //TODO: GET DECK USING SELECTED TABLE NAME AS PARAMETER

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:project_kog/models/card.dart';
+import 'package:project_kog/models/deck.dart';
 import 'package:project_kog/pages/card_detail.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
@@ -10,17 +11,22 @@ class FragmentCardList extends StatefulWidget {
   //1 => banlist
   //-1 => favourites
   //2 => cards specific to an archetype
+  //3 => cards specific to a created deck - MAIN
+  //4 => cards specific to a created deck - EXTRA
+  //5 => cards specific to a created deck - SIDE
   final int listType;
   final String searchParams;
   final String archetype;
+  final Deck deck;
 
-  FragmentCardList({this.listType, this.searchParams, this.archetype});
+  FragmentCardList({this.listType, this.searchParams, this.archetype, this.deck});
 
   @override
   _FragmentCardListState createState() => _FragmentCardListState(
         listType: this.listType,
         searchParams: this.searchParams,
         archetype: this.archetype,
+        deck: this.deck,
       );
 }
 
@@ -29,8 +35,9 @@ class _FragmentCardListState extends State<FragmentCardList>
   int listType;
   String searchParams;
   String archetype;
+  final Deck deck;
 
-  _FragmentCardListState({this.listType, this.searchParams, this.archetype});
+  _FragmentCardListState({this.listType, this.searchParams, this.archetype, this.deck});
 
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<YuGiOhCard> cardList;
@@ -170,6 +177,15 @@ class _FragmentCardListState extends State<FragmentCardList>
       case 2:
         futureList = await databaseHelper.getAllArchetypeCards(archetype);
         break;
+      case 3:
+        futureList = await databaseHelper.getAllCardsRelatedToDeck(deck, 'main');
+        break;
+      case 4:
+        futureList = await databaseHelper.getAllCardsRelatedToDeck(deck, 'extra');
+        break;
+      case 5:
+        futureList = await databaseHelper.getAllCardsRelatedToDeck(deck, 'side');
+        break;
       default:
         futureList = await databaseHelper.getAllCards();
         break;
@@ -224,6 +240,16 @@ class _AddToFavouritesOrDeckDialogState
 
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
 
+  List<Deck> deckList;
+  int count;
+  List<int> cardInDeck;
+
+  @override
+  void initState() {
+    getAllDecksFromDatabase();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Icon iconFavouriteBorder = Icon(Icons.favorite_border);
@@ -238,36 +264,41 @@ class _AddToFavouritesOrDeckDialogState
     return AlertDialog(
       title: Text('Add card to favourite list or to a deck!'),
       content: Container(
-        child: ListTile(
-          title: Text(
-            'Add to favourites',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          leading: IconButton(
-            icon: leadingIcon,
-            onPressed: () async {
+        child: Card(
+          elevation: 10,
+          child: ListTile(
+            title: Text(
+              'Add to favourites',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            leading: IconButton(
+              icon: leadingIcon,
+              onPressed: () async {
+                if (card.favourite == 1)
+                  card.favourite = 0;
+                else
+                  card.favourite = 1;
+                setState(() {
+                  leadingIcon = card.favourite == 0
+                      ? iconFavouriteBorder
+                      : iconFavourite;
+                });
+                await databaseHelper.updateCard(card);
+              },
+            ),
+            onTap: () async {
               if (card.favourite == 1)
                 card.favourite = 0;
               else
                 card.favourite = 1;
               setState(() {
-                leadingIcon =
-                    card.favourite == 0 ? iconFavouriteBorder : iconFavourite;
+                leadingIcon = (card.favourite == 0
+                    ? iconFavouriteBorder
+                    : iconFavourite);
               });
               await databaseHelper.updateCard(card);
             },
           ),
-          onTap: () async {
-            if (card.favourite == 1)
-              card.favourite = 0;
-            else
-              card.favourite = 1;
-            setState(() {
-              leadingIcon =
-                  (card.favourite == 0 ? iconFavouriteBorder : iconFavourite);
-            });
-            await databaseHelper.updateCard(card);
-          },
         ),
       ),
       actions: [
@@ -285,5 +316,14 @@ class _AddToFavouritesOrDeckDialogState
         ),
       ],
     );
+  }
+
+  void getAllDecksFromDatabase() async {
+    List<Deck> futureList;
+    futureList = await databaseHelper.getAllDecks();
+    setState(() {
+      deckList = futureList != null ? futureList : List<Deck>();
+      count = futureList != null ? futureList.length : 0;
+    });
   }
 }
