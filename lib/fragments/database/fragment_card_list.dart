@@ -14,13 +14,19 @@ class FragmentCardList extends StatefulWidget {
   //3 => cards specific to a created deck - MAIN
   //4 => cards specific to a created deck - EXTRA
   //5 => cards specific to a created deck - SIDE
+  //6 => cards to add to a specific deck
   final int listType;
   final String searchParams;
   final String archetype;
   final Deck deck;
+  final int tabIndexForSpecificDeck;
 
   FragmentCardList(
-      {this.listType, this.searchParams, this.archetype, this.deck});
+      {this.listType,
+      this.searchParams,
+      this.archetype,
+      this.deck,
+      this.tabIndexForSpecificDeck});
 
   @override
   _FragmentCardListState createState() => _FragmentCardListState(
@@ -28,6 +34,7 @@ class FragmentCardList extends StatefulWidget {
         searchParams: this.searchParams,
         archetype: this.archetype,
         deck: this.deck,
+        tabIndexForSpecificDeck: this.tabIndexForSpecificDeck,
       );
 }
 
@@ -36,10 +43,15 @@ class _FragmentCardListState extends State<FragmentCardList>
   int listType;
   String searchParams;
   String archetype;
-  final Deck deck;
+  Deck deck;
+  int tabIndexForSpecificDeck;
 
   _FragmentCardListState(
-      {this.listType, this.searchParams, this.archetype, this.deck});
+      {this.listType,
+      this.searchParams,
+      this.archetype,
+      this.deck,
+      this.tabIndexForSpecificDeck});
 
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<YuGiOhCard> cardList;
@@ -133,26 +145,122 @@ class _FragmentCardListState extends State<FragmentCardList>
                 ),
                 Row(
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    IconButton(
-                      icon: card.favourite == 0
-                          ? iconFavouriteBorder
-                          : iconFavourite,
-                      onPressed: () async {
-                        setState(() {
-                          if (card.favourite == 1)
-                            card.favourite = 0;
-                          else
-                            card.favourite = 1;
-                        });
-                        databaseHelper.updateCard(card);
-                        if (listType == -1)
-                          getAllCardsFromDatabase(
-                              listType, searchParams, archetype);
-                      },
-                    ),
+                    listType >= 3
+                        ? Container(
+                            margin: EdgeInsets.all(10),
+                            width: 40,
+                            height: 40,
+                            child: Center(
+                              child: RaisedButton(
+                                color: Theme.of(context).accentColor,
+                                onPressed: () async {
+                                  if (tabIndexForSpecificDeck == 0) {
+                                    if (card.main == 0) {
+                                      setState(() {
+                                        card.main++;
+                                      });
+                                      databaseHelper.insertCardInDeck(
+                                        card,
+                                        deck,
+                                        tabIndexForSpecificDeck,
+                                      );
+                                    } else if (card.main == 1 ||
+                                        card.main == 2) {
+                                      setState(() {
+                                        card.main++;
+                                      });
+                                      databaseHelper.updateCardInDeck(
+                                          card, deck, tabIndexForSpecificDeck);
+                                    } else if (card.main == 3) {
+                                      setState(() {
+                                        card.main = 0;
+                                      });
+                                      databaseHelper.deleteCardInDeck(
+                                          card, deck, tabIndexForSpecificDeck);
+                                    }
+                                  } else if (tabIndexForSpecificDeck == 1) {
+                                    if (card.extra == 0) {
+                                      setState(() {
+                                        card.extra++;
+                                      });
+                                      databaseHelper.insertCardInDeck(
+                                        card,
+                                        deck,
+                                        tabIndexForSpecificDeck,
+                                      );
+                                    } else if (card.extra == 1 ||
+                                        card.extra == 2) {
+                                      setState(() {
+                                        card.extra++;
+                                      });
+                                      databaseHelper.updateCardInDeck(
+                                          card, deck, tabIndexForSpecificDeck);
+                                    } else if (card.extra == 3) {
+                                      setState(() {
+                                        card.extra = 0;
+                                      });
+                                      databaseHelper.deleteCardInDeck(
+                                          card, deck, tabIndexForSpecificDeck);
+                                    }
+                                  } else {
+                                    if (card.side == 0) {
+                                      setState(() {
+                                        card.side++;
+                                      });
+                                      databaseHelper.insertCardInDeck(
+                                        card,
+                                        deck,
+                                        tabIndexForSpecificDeck,
+                                      );
+                                    } else if (card.side == 1 ||
+                                        card.extra == 2) {
+                                      setState(() {
+                                        card.side++;
+                                      });
+                                      databaseHelper.updateCardInDeck(
+                                          card, deck, tabIndexForSpecificDeck);
+                                    } else if (card.side == 3) {
+                                      setState(() {
+                                        card.side = 0;
+                                      });
+                                      databaseHelper.deleteCardInDeck(
+                                          card, deck, tabIndexForSpecificDeck);
+                                    }
+                                  }
+
+                                  getAllCardsFromDatabase(
+                                      listType, searchParams, archetype);
+                                },
+                                child: Text(
+                                  tabIndexForSpecificDeck == 0
+                                      ? '${card.main}'
+                                      : (tabIndexForSpecificDeck == 1
+                                          ? '${card.extra}'
+                                          : '${card.side}'),
+                                  style: TextStyle(fontSize: 17),
+                                ),
+                              ),
+                            ),
+                          )
+                        : IconButton(
+                            icon: card.favourite == 0
+                                ? iconFavouriteBorder
+                                : iconFavourite,
+                            onPressed: () async {
+                              setState(() {
+                                if (card.favourite == 1)
+                                  card.favourite = 0;
+                                else
+                                  card.favourite = 1;
+                              });
+                              databaseHelper.updateCard(card);
+                              if (listType == -1)
+                                getAllCardsFromDatabase(
+                                    listType, searchParams, archetype);
+                            },
+                          ),
                   ],
                 ),
               ],
@@ -191,6 +299,11 @@ class _FragmentCardListState extends State<FragmentCardList>
       case 5:
         futureList =
             await databaseHelper.getAllCardsRelatedToDeck(deck, 'side');
+        break;
+      case 6:
+        futureList = tabIndexForSpecificDeck != 1
+            ? (await databaseHelper.getAllCards())
+            : (await databaseHelper.getAllExtraDeckCards());
         break;
       default:
         futureList = await databaseHelper.getAllCards();

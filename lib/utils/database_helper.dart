@@ -196,6 +196,24 @@ class DatabaseHelper {
     return cardList;
   }
 
+  Future<List<Map<String, dynamic>>> getAllExtraDeckCardsAsMaps() async {
+    Database db = await instance.database;
+    return await db.rawQuery('SELECT * FROM $tableCards WHERE '
+        '$colType LIKE \'XYZ%\' OR '
+        '$colType LIKE \'Synchro%\' OR '
+        '$colType LIKE \'Link%\' '
+        'ORDER BY $colName asc');
+  }
+
+  Future<List<YuGiOhCard>> getAllExtraDeckCards() async {
+    var cardMapList = await getAllExtraDeckCardsAsMaps();
+    List<YuGiOhCard> cardList = List<YuGiOhCard>();
+    for (int i = 0; i < cardMapList.length; i++) {
+      cardList.add(YuGiOhCard.fromMapToObject(cardMapList[i]));
+    }
+    return cardList;
+  }
+
   Future<int> insertCard(YuGiOhCard card) async {
     Database db = await instance.database;
     return await db.insert(tableCards, card.toMap());
@@ -383,5 +401,29 @@ class DatabaseHelper {
     return cardList;
   }
 
-  //TODO: GET DECK USING SELECTED TABLE NAME AS PARAMETER
+  Future<int> insertCardInDeck(YuGiOhCard card, Deck deck, int tabIndex) async {
+    String deckType = tabIndex == 0 ? 'main' : (tabIndex == 1 ? 'extra' : 'side');
+    String tableName = '${deck.name}$deckType';
+    Database db = await instance.database;
+    return await db.insert(tableName, card.toMap());
+  }
+
+  Future<int> updateCardInDeck(YuGiOhCard card, Deck deck, int tabIndex) async {
+    String deckType = tabIndex == 0 ? 'main' : (tabIndex == 1 ? 'extra' : 'side');
+    String tableName = '${deck.name}$deckType';
+    Database db = await instance.database;
+    return db.update(
+      tableName,
+      card.toMap(),
+      where: '$colId = ?',
+      whereArgs: [card.id],
+    );
+  }
+
+  Future<int> deleteCardInDeck(YuGiOhCard card, Deck deck, int tabIndex) async{
+    String deckType = tabIndex == 0 ? 'main' : (tabIndex == 1 ? 'extra' : 'side');
+    String tableName = '${deck.name}$deckType';
+    Database db = await instance.database;
+    return await db.rawDelete('DELETE FROM $tableName WHERE $colId = ${card.id}');
+  }
 }

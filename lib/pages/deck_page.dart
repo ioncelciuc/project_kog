@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
 import 'package:project_kog/models/deck.dart';
+import 'package:project_kog/pages/custom_card_list_page.dart';
 
 class DeckPage extends StatefulWidget {
   final Deck deck;
@@ -47,8 +48,15 @@ class _DeckPageState extends State<DeckPage>
         actions: [
           IconButton(
             icon: Icon(Icons.add_box),
-            onPressed: () {
-              //add card to deck
+            onPressed: () async{
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CustomCardListPage(
+                      deck: this.deck,
+                      tabIndex: tabController.index,
+                    ),
+                  ));
             },
           )
         ],
