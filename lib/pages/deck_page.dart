@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
 import 'package:project_kog/models/deck.dart';
-import 'package:project_kog/pages/custom_card_list_page.dart';
 import 'package:project_kog/utils/card_list_type.dart';
 
 class DeckPage extends StatefulWidget {

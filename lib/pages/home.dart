@@ -31,18 +31,18 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _selectedDrawerIndex = 0;
 
-  _getDrawerItemWidget(int pos) {
+  _getDrawerItemWidget(int pos, GlobalKey<ScaffoldState> homeScaffoldState) {
     switch (pos) {
       case 0:
-        return FragmentDashboard();
+        return FragmentDashboard(homeScaffoldState: homeScaffoldState);
       case 1:
-        return FragmentDatabase();
+        return FragmentDatabase(homeScaffoldState: homeScaffoldState);
       case 2:
-        return FragmentCalculator();
+        return FragmentCalculator(homeScaffoldState: homeScaffoldState);
       case 3:
-        return FragmentFavourites();
+        return FragmentFavourites(homeScaffoldState: homeScaffoldState);
       case 4:
-        return FragmentDecks();
+        return FragmentDecks(homeScaffoldState: homeScaffoldState);
     }
   }
 
@@ -63,11 +63,10 @@ class _HomeState extends State<Home> {
         onTap: () => _onSelectItem(i),
       ));
     }
-
+    final GlobalKey<ScaffoldState> _homeScaffoldState =
+        GlobalKey<ScaffoldState>();
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.drawerItems[_selectedDrawerIndex].title),
-      ),
+      key: _homeScaffoldState,
       drawer: Drawer(
         child: ListView(
           children: [
@@ -95,7 +94,7 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      body: _getDrawerItemWidget(_selectedDrawerIndex),
+      body: _getDrawerItemWidget(_selectedDrawerIndex, _homeScaffoldState),
     );
   }
 }

@@ -47,11 +47,11 @@ class DataSearch extends SearchDelegate<String> {
   @override
   Widget buildResults(BuildContext context) {
     //show result based on the selection
-    return listType == CardListType.ARCHETYPE_CARDS
+    return listType == null
         ? FragmentArchetypes(searchParams: query)
         : FragmentCardList(
             listType: listType,
-            //searchParams: query,
+            searchParams: query,
           );
   }
 

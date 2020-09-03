@@ -4,6 +4,11 @@ import 'package:project_kog/pages/deck_page.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
 class FragmentDecks extends StatefulWidget {
+
+  final GlobalKey<ScaffoldState> homeScaffoldState;
+
+  FragmentDecks({this.homeScaffoldState});
+
   @override
   _FragmentDecksState createState() => _FragmentDecksState();
 }
@@ -96,6 +101,16 @@ class _FragmentDecksState extends State<FragmentDecks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 10,
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            widget.homeScaffoldState.currentState.openDrawer();
+          },
+        ),
+        title: Text('My Decks'),
+      ),
       body: ListView.builder(
           itemCount: count,
           itemBuilder: (BuildContext context, int index) {
