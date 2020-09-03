@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
+import 'package:project_kog/utils/card_list_type.dart';
 
 class CardList extends StatefulWidget {
-  final int listType;
+  final CardListType listType;
   final String searchParams;
   final String archetype;
 
@@ -17,7 +18,7 @@ class CardList extends StatefulWidget {
 }
 
 class _CardListState extends State<CardList> {
-  final int listType;
+  final CardListType listType;
   final String searchParams;
   final String archetype;
 

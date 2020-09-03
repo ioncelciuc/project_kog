@@ -4,20 +4,11 @@ import 'package:project_kog/pages/deck_page.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
 class FragmentDecks extends StatefulWidget {
-  final GlobalKey<ScaffoldState> homeScaffoldState;
-
-  FragmentDecks({this.homeScaffoldState});
-
   @override
-  _FragmentDecksState createState() =>
-      _FragmentDecksState(homeScaffoldState: this.homeScaffoldState);
+  _FragmentDecksState createState() => _FragmentDecksState();
 }
 
 class _FragmentDecksState extends State<FragmentDecks> {
-  final GlobalKey<ScaffoldState> homeScaffoldState;
-
-  _FragmentDecksState({this.homeScaffoldState});
-
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<Deck> deckList;
   int count = 0;
@@ -105,16 +96,6 @@ class _FragmentDecksState extends State<FragmentDecks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 10,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            homeScaffoldState.currentState.openDrawer();
-          },
-        ),
-        title: Text('My Decks'),
-      ),
       body: ListView.builder(
           itemCount: count,
           itemBuilder: (BuildContext context, int index) {
@@ -122,7 +103,11 @@ class _FragmentDecksState extends State<FragmentDecks> {
               elevation: 5,
               child: ListTile(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => DeckPage(deck: deckList[index])));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              DeckPage(deck: deckList[index])));
                 },
                 title: Text('${deckList[index].name}'),
                 trailing: IconButton(

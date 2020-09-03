@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
 import 'package:project_kog/models/deck.dart';
 import 'package:project_kog/pages/custom_card_list_page.dart';
+import 'package:project_kog/utils/card_list_type.dart';
 
 class DeckPage extends StatefulWidget {
   final Deck deck;
@@ -45,28 +46,13 @@ class _DeckPageState extends State<DeckPage>
             Tab(text: 'SIDE'),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add_box),
-            onPressed: () async{
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CustomCardListPage(
-                      deck: this.deck,
-                      tabIndex: tabController.index,
-                    ),
-                  ));
-            },
-          )
-        ],
       ),
       body: TabBarView(
         controller: tabController,
         children: [
-          FragmentCardList(listType: 3, deck: deck),
-          FragmentCardList(listType: 4, deck: deck),
-          FragmentCardList(listType: 5, deck: deck),
+          FragmentCardList(listType: CardListType.MAIN_DECK_CARDS, deck: deck),
+          FragmentCardList(listType: CardListType.EXTRA_DECK_CARDS, deck: deck),
+          FragmentCardList(listType: CardListType.SIDE_DECK_CARDS, deck: deck),
         ],
       ),
     );

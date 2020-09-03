@@ -5,20 +5,11 @@ import 'package:project_kog/models/log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FragmentCalculator extends StatefulWidget {
-  final GlobalKey<ScaffoldState> homeScaffoldState;
-
-  FragmentCalculator({this.homeScaffoldState});
-
   @override
-  _FragmentCalculatorState createState() =>
-      _FragmentCalculatorState(homeScaffoldState: this.homeScaffoldState);
+  _FragmentCalculatorState createState() => _FragmentCalculatorState();
 }
 
 class _FragmentCalculatorState extends State<FragmentCalculator> {
-  final GlobalKey<ScaffoldState> homeScaffoldState;
-
-  _FragmentCalculatorState({this.homeScaffoldState});
-
   int lpToCalculate = 0;
   int lpToSubstract = 0;
   int lpPlayer1;
@@ -303,40 +294,6 @@ class _FragmentCalculatorState extends State<FragmentCalculator> {
     Color unselectedContainerColor = Colors.black54;
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 10,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            homeScaffoldState.currentState.openDrawer();
-          },
-        ),
-        title: Text('Calculator'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              saveChanges();
-            },
-            icon: Icon(Icons.save),
-          ),
-          IconButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => DiceDialog(),
-                barrierDismissible: true,
-              );
-            },
-            icon: Icon(DiceIcon.perspective_dice_one),
-          ),
-          IconButton(
-            onPressed: () {
-              showDialog(context: context, builder: (_) => buildResetDialog());
-            },
-            icon: Icon(Icons.refresh),
-          ),
-        ],
-      ),
       body: Column(
         children: [
           Expanded(
@@ -773,3 +730,29 @@ class _CoinDialogState extends State<CoinDialog> {
     );
   }
 }
+
+//Custom actions
+//actions: [
+//IconButton(
+//onPressed: () {
+//saveChanges();
+//},
+//icon: Icon(Icons.save),
+//),
+//IconButton(
+//onPressed: () {
+//showDialog(
+//context: context,
+//builder: (_) => DiceDialog(),
+//barrierDismissible: true,
+//);
+//},
+//icon: Icon(DiceIcon.perspective_dice_one),
+//),
+//IconButton(
+//onPressed: () {
+//showDialog(context: context, builder: (_) => buildResetDialog());
+//},
+//icon: Icon(Icons.refresh),
+//),
+//],

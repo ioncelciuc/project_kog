@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_archetypes.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
+import 'package:project_kog/utils/card_list_type.dart';
 
 class DataSearch extends SearchDelegate<String> {
-  int tabIndex = -1;
+  CardListType listType;
 
-  DataSearch({this.tabIndex});
+  DataSearch({this.listType});
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -46,11 +47,11 @@ class DataSearch extends SearchDelegate<String> {
   @override
   Widget buildResults(BuildContext context) {
     //show result based on the selection
-    return tabIndex == 2
+    return listType == CardListType.ARCHETYPE_CARDS
         ? FragmentArchetypes(searchParams: query)
         : FragmentCardList(
-            listType: tabIndex,
-            searchParams: query,
+            listType: listType,
+            //searchParams: query,
           );
   }
 

@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:project_kog/models/archetype.dart';
 import 'package:project_kog/models/deck.dart';
+import 'package:project_kog/utils/card_list_type.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:project_kog/models/card.dart';
 
@@ -199,8 +200,9 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getAllExtraDeckCardsAsMaps() async {
     Database db = await instance.database;
     return await db.rawQuery('SELECT * FROM $tableCards WHERE '
-        '$colType LIKE \'XYZ%\' OR '
+        '$colType LIKE \'Fusion%\' OR '
         '$colType LIKE \'Synchro%\' OR '
+        '$colType LIKE \'XYZ%\' OR '
         '$colType LIKE \'Link%\' '
         'ORDER BY $colName asc');
   }
@@ -379,20 +381,27 @@ class DatabaseHelper {
     return await db.insert(tableDecks, deck.toMap());
   }
 
-  Future<int> deleteDeck(Deck deck) async{
+  Future<int> deleteDeck(Deck deck) async {
     Database db = await instance.database;
     await db.execute('DROP TABLE IF EXISTS ${deck.name}main');
     await db.execute('DROP TABLE IF EXISTS ${deck.name}extra');
     await db.execute('DROP TABLE IF EXISTS ${deck.name}side');
-    return await db.rawDelete('DELETE FROM $tableDecks WHERE $colId = ${deck.id}');
+    return await db
+        .rawDelete('DELETE FROM $tableDecks WHERE $colId = ${deck.id}');
   }
 
-  Future<List<Map<String, dynamic>>> getAllCardsRelatedToDeckAsMaps(Deck deck, String deckType) async {
+  Future<List<Map<String, dynamic>>> getAllCardsRelatedToDeckAsMaps(
+      Deck deck, String deckType) async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM ${deck.name}$deckType ORDER BY $colType asc');
+    return await db
+        .rawQuery('SELECT * FROM ${deck.name}$deckType ORDER BY $colType asc');
   }
 
-  Future<List<YuGiOhCard>> getAllCardsRelatedToDeck(Deck deck, String deckType) async {
+  Future<List<YuGiOhCard>> getAllCardsRelatedToDeck(
+      Deck deck, CardListType cardListType) async {
+    String deckType = cardListType == CardListType.MAIN_DECK_CARDS
+        ? 'main'
+        : (cardListType == CardListType.EXTRA_DECK_CARDS ? 'extra' : 'side');
     var cardMapList = await getAllCardsRelatedToDeckAsMaps(deck, deckType);
     List<YuGiOhCard> cardList = List<YuGiOhCard>();
     for (int i = 0; i < cardMapList.length; i++) {
@@ -401,15 +410,21 @@ class DatabaseHelper {
     return cardList;
   }
 
-  Future<int> insertCardInDeck(YuGiOhCard card, Deck deck, int tabIndex) async {
-    String deckType = tabIndex == 0 ? 'main' : (tabIndex == 1 ? 'extra' : 'side');
+  Future<int> insertCardInDeck(
+      YuGiOhCard card, Deck deck, CardListType cardListType) async {
+    String deckType = (cardListType == CardListType.MAIN_DECK_CARDS
+        ? 'main'
+        : (cardListType == CardListType.EXTRA_DECK_CARDS ? 'extra' : 'side'));
     String tableName = '${deck.name}$deckType';
     Database db = await instance.database;
     return await db.insert(tableName, card.toMap());
   }
 
-  Future<int> updateCardInDeck(YuGiOhCard card, Deck deck, int tabIndex) async {
-    String deckType = tabIndex == 0 ? 'main' : (tabIndex == 1 ? 'extra' : 'side');
+  Future<int> updateCardInDeck(
+      YuGiOhCard card, Deck deck, CardListType cardListType) async {
+    String deckType = (cardListType == CardListType.MAIN_DECK_CARDS
+        ? 'main'
+        : (cardListType == CardListType.EXTRA_DECK_CARDS ? 'extra' : 'side'));
     String tableName = '${deck.name}$deckType';
     Database db = await instance.database;
     return db.update(
@@ -420,10 +435,14 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> deleteCardInDeck(YuGiOhCard card, Deck deck, int tabIndex) async{
-    String deckType = tabIndex == 0 ? 'main' : (tabIndex == 1 ? 'extra' : 'side');
+  Future<int> deleteCardInDeck(
+      YuGiOhCard card, Deck deck, CardListType cardListType) async {
+    String deckType = cardListType == CardListType.MAIN_DECK_CARDS
+        ? 'main'
+        : (cardListType == CardListType.EXTRA_DECK_CARDS ? 'extra' : 'side');
     String tableName = '${deck.name}$deckType';
     Database db = await instance.database;
-    return await db.rawDelete('DELETE FROM $tableName WHERE $colId = ${card.id}');
+    return await db
+        .rawDelete('DELETE FROM $tableName WHERE $colId = ${card.id}');
   }
 }

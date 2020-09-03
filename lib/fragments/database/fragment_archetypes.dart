@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/models/archetype.dart';
 import 'package:project_kog/pages/card_list.dart';
+import 'package:project_kog/utils/card_list_type.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
 class FragmentArchetypes extends StatefulWidget {
@@ -41,7 +42,7 @@ class _FragmentArchetypesState extends State<FragmentArchetypes>
               MaterialPageRoute(
                 builder: (context) => CardList(
                   archetype: archetypeList[index].name,
-                  listType: 2,
+                  listType: CardListType.ARCHETYPE_CARDS,
                 ),
               ),
             );

@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_archetypes.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
-import 'package:project_kog/utils/data_search.dart';
+import 'package:project_kog/utils/card_list_type.dart';
 
 class FragmentDatabase extends StatefulWidget {
-  final GlobalKey<ScaffoldState> homeScaffoldState;
-
-  FragmentDatabase({this.homeScaffoldState});
-
   @override
-  _FragmentDatabaseState createState() =>
-      _FragmentDatabaseState(homeScaffoldState: this.homeScaffoldState);
+  _FragmentDatabaseState createState() => _FragmentDatabaseState();
 }
 
-class _FragmentDatabaseState extends State<FragmentDatabase> with SingleTickerProviderStateMixin{
-  final GlobalKey<ScaffoldState> homeScaffoldState;
-
-  _FragmentDatabaseState({this.homeScaffoldState});
-
+class _FragmentDatabaseState extends State<FragmentDatabase>
+    with SingleTickerProviderStateMixin {
   TabController tabController;
 
   @override
@@ -34,39 +26,21 @@ class _FragmentDatabaseState extends State<FragmentDatabase> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        elevation: 10,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            homeScaffoldState.currentState.openDrawer();
-          },
-        ),
-        title: Text('Database'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(context: context, delegate: DataSearch(tabIndex: tabController.index));
-            },
-          ),
+      backgroundColor: Theme.of(context).primaryColor,
+      appBar: TabBar(
+        controller: tabController,
+        tabs: [
+          Tab(text: 'ALL CARDS'),
+          Tab(text: 'BANLIST'),
+          Tab(text: 'ARCHETYPES'),
         ],
-        bottom: TabBar(
-          controller: tabController,
-          tabs: [
-            Tab(text: 'ALL CARDS'),
-            Tab(text: 'BANLIST'),
-            Tab(text: 'ARCHETYPES'),
-          ],
-        ),
       ),
       body: TabBarView(
         controller: tabController,
         children: [
-          FragmentCardList(listType: 0),
-          FragmentCardList(listType: 1),
+          FragmentCardList(listType: CardListType.ALL_CARDS),
+          FragmentCardList(listType: CardListType.BANLIST_CARDS),
           FragmentArchetypes(),
         ],
       ),

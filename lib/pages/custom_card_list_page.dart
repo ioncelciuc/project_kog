@@ -1,37 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
+import 'package:project_kog/models/card.dart';
 import 'package:project_kog/models/deck.dart';
+import 'package:project_kog/utils/card_list_type.dart';
 
 class CustomCardListPage extends StatefulWidget {
   final Deck deck;
-  final int tabIndex;
+  final CardListType cardListType;
 
-  CustomCardListPage({this.deck, this.tabIndex});
+  CustomCardListPage({this.deck, this.cardListType});
 
   @override
   _CustomCardListPageState createState() =>
-      _CustomCardListPageState(deck: this.deck, tabIndex: this.tabIndex);
+      _CustomCardListPageState(deck: this.deck, cardListType: this.cardListType);
 }
 
 class _CustomCardListPageState extends State<CustomCardListPage> {
   Deck deck;
-  int tabIndex;
+  CardListType cardListType;
 
-  _CustomCardListPageState({this.deck, this.tabIndex});
+  _CustomCardListPageState({this.deck, this.cardListType});
+
+  List<YuGiOhCard> cardList = List<YuGiOhCard>();
 
   @override
   Widget build(BuildContext context) {
     String deckType =
-        tabIndex == 0 ? 'Main' : (tabIndex == 1 ? 'Extra' : 'Side');
+        cardListType == CardListType.MAIN_DECK_CARDS ? 'Main' : (cardListType == CardListType.EXTRA_DECK_CARDS ? 'Extra' : 'Side');
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Add cards to $deckType Deck'),
       ),
       body: FragmentCardList(
-        listType: 6,
+        listType: CardListType.ADD_CARDS_TO_NEW_DECK,
         deck: deck,
-        tabIndexForSpecificDeck: tabIndex,
+        deckType: cardListType,
       ),
     );
   }
