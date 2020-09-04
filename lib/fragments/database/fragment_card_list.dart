@@ -157,19 +157,18 @@ class _FragmentCardListState extends State<FragmentCardList>
         ),
         backgroundColor: Theme.of(context).primaryColor,
         onPressed: () async {
-          List<Filter> futureFilterList = await Navigator.push(
+          List<Filter> filterListParam = filterList;
+          final List<Filter> result = await Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => FilterPage(filterList: this.filterList)),
+              builder: (context) => FilterPage(filterList: filterListParam),
+            ),
           );
-          if (futureFilterList != null) {
-            setState(() {
-              filterList = futureFilterList;
-            });
-            for (int i = 0; i < filterList.length; i++) {
-              if (filterList[i].selected == true) print(filterList[i].name);
+          setState(() {
+            for (int i = 0; i < result.length; i++) {
+              filterList[i].selected = result[i].selected;
             }
-          }
+          });
         },
       ),
     );
