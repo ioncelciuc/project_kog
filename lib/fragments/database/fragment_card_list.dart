@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:project_kog/models/card.dart';
 import 'package:project_kog/models/deck.dart';
+import 'package:project_kog/models/filter.dart';
 import 'package:project_kog/pages/card_detail.dart';
+import 'package:project_kog/pages/filter_page.dart';
 import 'package:project_kog/utils/card_list_type.dart';
 import 'package:project_kog/utils/database_helper.dart';
 
@@ -50,10 +52,12 @@ class _FragmentCardListState extends State<FragmentCardList>
 
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<YuGiOhCard> cardList = List<YuGiOhCard>();
+  List<Filter> filterList = List<Filter>();
 
   @override
   void initState() {
     super.initState();
+    initializareTractor();
     getAllCardsFromDatabase();
   }
 
@@ -62,87 +66,112 @@ class _FragmentCardListState extends State<FragmentCardList>
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: cardList.length,
-      itemBuilder: (BuildContext context, int index) {
-        YuGiOhCard card = cardList[index];
-        String generalInfo = (card.type.contains('Spell')
-            ? 'SPELL / ${card.race}'
-            : (card.type.contains('Trap')
-                ? 'TRAP / ${card.race}'
-                : '${card.attribute.toUpperCase()} / ${card.race} / ${(card.type.contains('Monster') ? card.type.substring(0, card.type.lastIndexOf('Monster')) : card.type)}'));
-        String stats = (card.attribute == ''
-            ? ''
-            : (card.type.contains('Link')
-                ? '${card.atk} / LINK-${card.linkval}'
-                : (card.type.contains('Pendulum')
-                    ? '${card.atk} / ${card.def} / LEVEL ${card.level} / SCALE ${card.scale}'
-                    : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
-        return GestureDetector(
-          onTap: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CardDetail(card: cardList[index]),
-              ),
-            );
-            if (listType == CardListType.FAVOURITE_CARDS)
-              getAllCardsFromDatabase();
-          },
-          child: Container(
-            height: 86,
-            color: Colors.white,
-            child: Row(
-              children: [
-                CachedNetworkImage(
-                  height: 86,
-                  imageUrl: card.imageUrlSmall,
-                  placeholder: (context, url) =>
-                      Image.asset('assets/card_back.jpg'),
-                  errorWidget: (context, url, error) =>
-                      Image.asset('assets/card_back.jpg'),
+    return Scaffold(
+      body: ListView.builder(
+        itemCount: cardList.length,
+        itemBuilder: (BuildContext context, int index) {
+          YuGiOhCard card = cardList[index];
+          String generalInfo = (card.type.contains('Spell')
+              ? 'SPELL / ${card.race}'
+              : (card.type.contains('Trap')
+                  ? 'TRAP / ${card.race}'
+                  : '${card.attribute.toUpperCase()} / ${card.race} / ${(card.type.contains('Monster') ? card.type.substring(0, card.type.lastIndexOf('Monster')) : card.type)}'));
+          String stats = (card.attribute == ''
+              ? ''
+              : (card.type.contains('Link')
+                  ? '${card.atk} / LINK-${card.linkval}'
+                  : (card.type.contains('Pendulum')
+                      ? '${card.atk} / ${card.def} / LEVEL ${card.level} / SCALE ${card.scale}'
+                      : '${card.atk} / ${card.def} / LEVEL ${card.level}')));
+          return GestureDetector(
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CardDetail(card: cardList[index]),
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Marquee(
-                        child: Text(
-                          '${card.name}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+              );
+              if (listType == CardListType.FAVOURITE_CARDS)
+                getAllCardsFromDatabase();
+            },
+            child: Container(
+              height: 86,
+              color: Colors.white,
+              child: Row(
+                children: [
+                  CachedNetworkImage(
+                    height: 86,
+                    imageUrl: card.imageUrlSmall,
+                    placeholder: (context, url) =>
+                        Image.asset('assets/card_back.jpg'),
+                    errorWidget: (context, url, error) =>
+                        Image.asset('assets/card_back.jpg'),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Marquee(
+                          child: Text(
+                            '${card.name}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          pauseDuration: Duration(milliseconds: 500),
                         ),
-                        pauseDuration: Duration(milliseconds: 500),
-                      ),
-                      Marquee(
-                        child: Text(generalInfo),
-                        pauseDuration: Duration(milliseconds: 500),
-                      ),
-                      Marquee(
-                        child: Text(stats),
-                        pauseDuration: Duration(milliseconds: 500),
-                      ),
+                        Marquee(
+                          child: Text(generalInfo),
+                          pauseDuration: Duration(milliseconds: 500),
+                        ),
+                        Marquee(
+                          child: Text(stats),
+                          pauseDuration: Duration(milliseconds: 500),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      trailingIcon(card),
                     ],
                   ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    trailingIcon(card),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: listType,
+        child: Icon(
+          Icons.filter_list,
+          color: Colors.white,
+        ),
+        backgroundColor: Theme.of(context).primaryColor,
+        onPressed: () async {
+          List<Filter> futureFilterList = await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => FilterPage(filterList: this.filterList)),
+          );
+          if (futureFilterList != null) {
+            setState(() {
+              filterList = futureFilterList;
+            });
+            for (int i = 0; i < filterList.length; i++) {
+              if (filterList[i].selected == true) print(filterList[i].name);
+            }
+          }
+        },
+      ),
     );
   }
 
@@ -224,5 +253,25 @@ class _FragmentCardListState extends State<FragmentCardList>
     setState(() {
       this.cardList = futureList;
     });
+  }
+
+  void initializareTractor() {
+    filterList.add(Filter(name: 'Normal'));
+    filterList.add(Filter(name: 'Effect'));
+    filterList.add(Filter(name: 'Ritual'));
+    filterList.add(Filter(name: 'Fusion'));
+    filterList.add(Filter(name: 'Synchro'));
+    filterList.add(Filter(name: 'XYZ'));
+    filterList.add(Filter(name: 'Pendulum'));
+    filterList.add(Filter(name: 'Spell'));
+    filterList.add(Filter(name: 'Trap'));
+    filterList.add(Filter(name: 'Link'));
+    filterList.add(Filter(name: 'DARK'));
+    filterList.add(Filter(name: 'EARTH'));
+    filterList.add(Filter(name: 'FIRE'));
+    filterList.add(Filter(name: 'LIGHT'));
+    filterList.add(Filter(name: 'WATER'));
+    filterList.add(Filter(name: 'WIND'));
+    filterList.add(Filter(name: 'DIVINE'));
   }
 }

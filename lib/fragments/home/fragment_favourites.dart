@@ -27,20 +27,6 @@ class _FragmentFavouritesState extends State<FragmentFavourites> {
         title: Text('Favourites'),
       ),
       body: FragmentCardList(listType: CardListType.FAVOURITE_CARDS),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () {
-          SnackBar snackBar = SnackBar(
-            content: Text('Not yet implemented'),
-            duration: Duration(seconds: 1),
-          );
-          Scaffold.of(context).showSnackBar(snackBar);
-        },
-      ),
     );
   }
 }
