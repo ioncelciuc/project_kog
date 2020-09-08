@@ -169,6 +169,7 @@ class _FragmentCardListState extends State<FragmentCardList>
               filterList[i].selected = result[i].selected;
             }
           });
+          getAllCardsFromDatabase();
         },
       ),
     );
@@ -229,6 +230,7 @@ class _FragmentCardListState extends State<FragmentCardList>
     }
 
     if (searchParams != null && searchParams != '') {
+      //futureList = cardList;
       List<YuGiOhCard> searchList = List<YuGiOhCard>();
       for (int i = 0; i < futureList.length; i++) {
         if (futureList[i]
@@ -244,17 +246,92 @@ class _FragmentCardListState extends State<FragmentCardList>
         }
       }
       setState(() {
-        this.cardList = searchList;
+        this.cardList = filterCardList(searchList);
+        //this.cardList = searchList;
       });
       return;
     }
 
     setState(() {
-      this.cardList = futureList;
+      this.cardList = filterCardList(futureList);
     });
   }
 
+  List<YuGiOhCard> filterCardList(List<YuGiOhCard> futureList) {
+    bool atLeastAnOption = false;
+    for (int i = 0; i < filterList.length && atLeastAnOption == false; i++)
+      if (filterList[i].selected == true) atLeastAnOption = true;
+    if (atLeastAnOption == false) return futureList;
+
+    List<YuGiOhCard> cardListFiltered = List<YuGiOhCard>();
+
+    ///CARD TYPES
+    bool atLeastOneCardTypeOption = false;
+    for (int i = 0; i < 10 && atLeastOneCardTypeOption == false; i++)
+      if (filterList[i].selected == true) atLeastOneCardTypeOption = true;
+    if (atLeastOneCardTypeOption) {
+      for (int i = 0; i < 10; i++)
+        if (filterList[i].selected == true) {
+          if (filterList[i].name == 'Effect') {
+            for (int j = 0; j < futureList.length; j++)
+              if (futureList[j].type.startsWith(filterList[i].name) ||
+                  futureList[j].type.startsWith('Tuner'))
+                cardListFiltered.add(futureList[j]);
+          } else {
+            for (int j = 0; j < futureList.length; j++)
+              if (futureList[j].type.startsWith(filterList[i].name))
+                cardListFiltered.add(futureList[j]);
+          }
+        }
+    }
+
+    ///ATTRIBUTES
+    bool atLeastAnAttributeOption = false;
+    for (int i = 10; i < 17 && atLeastAnAttributeOption == false; i++)
+      if (filterList[i].selected == true) atLeastAnAttributeOption = true;
+    if (atLeastAnAttributeOption) {
+      if (cardListFiltered.length > 0) {
+        futureList.clear();
+        for (int i = 0; i < cardListFiltered.length; i++)
+          futureList.add(cardListFiltered[i]);
+        cardListFiltered.clear();
+      }
+      for (int i = 10; i < 17; i++) {
+        if (filterList[i].selected == true)
+          for (int j = 0; j < futureList.length; j++)
+            if (futureList[j].attribute == filterList[i].name)
+              cardListFiltered.add(futureList[j]);
+      }
+    }
+
+    ///MONSTER TYPE
+    bool atLeastOneMonsterTypeOption = false;
+    for (int i = 17; i < 42 && atLeastOneMonsterTypeOption == false; i++)
+      if (filterList[i].selected == true) atLeastOneMonsterTypeOption = true;
+    if (atLeastOneMonsterTypeOption) {
+      if (cardListFiltered.length > 0) {
+        futureList.clear();
+        for (int i = 0; i < cardListFiltered.length; i++)
+          futureList.add(cardListFiltered[i]);
+        cardListFiltered.clear();
+        for (int i = 17; i < 42; i++) {
+          if (filterList[i].selected == true)
+            for (int j = 0; j < futureList.length; j++)
+              if (futureList[j].race == filterList[i].name)
+                cardListFiltered.add(futureList[j]);
+        }
+      }
+    }
+
+
+
+    //sort and return list
+    cardListFiltered.sort((a, b) => a.name.compareTo(b.name));
+    return cardListFiltered;
+  }
+
   void initializareTractor() {
+    //card types
     filterList.add(Filter(name: 'Normal'));
     filterList.add(Filter(name: 'Effect'));
     filterList.add(Filter(name: 'Ritual'));
@@ -265,6 +342,7 @@ class _FragmentCardListState extends State<FragmentCardList>
     filterList.add(Filter(name: 'Spell'));
     filterList.add(Filter(name: 'Trap'));
     filterList.add(Filter(name: 'Link'));
+    //attributes
     filterList.add(Filter(name: 'DARK'));
     filterList.add(Filter(name: 'EARTH'));
     filterList.add(Filter(name: 'FIRE'));
@@ -272,5 +350,31 @@ class _FragmentCardListState extends State<FragmentCardList>
     filterList.add(Filter(name: 'WATER'));
     filterList.add(Filter(name: 'WIND'));
     filterList.add(Filter(name: 'DIVINE'));
+    //monster types
+    filterList.add(Filter(name: 'Aqua'));
+    filterList.add(Filter(name: 'Beast'));
+    filterList.add(Filter(name: 'Beast-Warrior'));
+    filterList.add(Filter(name: 'Creator-God'));
+    filterList.add(Filter(name: 'Cyberse'));
+    filterList.add(Filter(name: 'Dinosaur'));
+    filterList.add(Filter(name: 'Divine-Beast'));
+    filterList.add(Filter(name: 'Dragon'));
+    filterList.add(Filter(name: 'Fairy'));
+    filterList.add(Filter(name: 'Fiend'));
+    filterList.add(Filter(name: 'Fish'));
+    filterList.add(Filter(name: 'Insect'));
+    filterList.add(Filter(name: 'Machine'));
+    filterList.add(Filter(name: 'Plant'));
+    filterList.add(Filter(name: 'Psychic'));
+    filterList.add(Filter(name: 'Pyro'));
+    filterList.add(Filter(name: 'Reptile'));
+    filterList.add(Filter(name: 'Rock'));
+    filterList.add(Filter(name: 'Sea Serpent'));
+    filterList.add(Filter(name: 'Spellcaster'));
+    filterList.add(Filter(name: 'Thunder'));
+    filterList.add(Filter(name: 'Warrior'));
+    filterList.add(Filter(name: 'Winged-Beast'));
+    filterList.add(Filter(name: 'Wyrm'));
+    filterList.add(Filter(name: 'Zombie'));
   }
 }

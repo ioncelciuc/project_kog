@@ -31,16 +31,30 @@ class _FilterPageState extends State<FilterPage> {
               filterList[index].selected = !filterList[index].selected;
             });
           },
-          padding: EdgeInsets.all(image != null || text != null ? 8 : 0),
+          padding: EdgeInsets.all(
+              index == 6 ? 0 : (image != null || text != null ? 8 : 0)),
           child: index == 6
-              ? Ink(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.deepOrange[400], Colors.green[500]],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+              ? Stack(
+                  children: [
+                    Ink(
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.deepOrange[400], Colors.green[500]],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          borderRadius: BorderRadius.circular(0)),
+                    ),
+                    Center(
+                      child: Text(
+                        text != null ? text : '',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: index == 5 ? Colors.white : Colors.black,
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(0)),
+                    ),
+                  ],
                 )
               : Row(
                   children: [
@@ -52,7 +66,14 @@ class _FilterPageState extends State<FilterPage> {
                     ),
                     Expanded(
                       flex: image != null ? 2 : 1,
-                      child: Center(child: Text(text != null ? text : '')),
+                      child: Center(
+                        child: Text(
+                          text != null ? text : '',
+                          style: TextStyle(
+                            color: index == 5 ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -65,6 +86,36 @@ class _FilterPageState extends State<FilterPage> {
               style: BorderStyle.solid,
             ),
             borderRadius: BorderRadius.circular(0),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildUnselectButton({int rangeLeft, int rangeRight}) {
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.all(4),
+        height: 50,
+        child: FlatButton(
+          color: Colors.red,
+          onPressed: () {
+            setState(() {
+              for (int i = rangeLeft; i <= rangeRight; i++)
+                filterList[i].selected = false;
+            });
+          },
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: Colors.grey,
+              width: 2,
+              style: BorderStyle.solid,
+            ),
+            borderRadius: BorderRadius.circular(0),
+          ),
+          child: Icon(
+            Icons.clear,
+            color: Colors.white,
           ),
         ),
       ),
@@ -103,33 +154,73 @@ class _FilterPageState extends State<FilterPage> {
           children: [
             Padding(
               padding: EdgeInsets.all(4),
-              child: Text('Border Color', style: TextStyle(fontSize: 20)),
+              child: Text('Card Type', style: TextStyle(fontSize: 20)),
             ),
             Row(
               children: [
-                buildButton(index: 0, buttonColor: Colors.yellow[300]),
-                buildButton(index: 1, buttonColor: Colors.deepOrange[400]),
-                buildButton(index: 2, buttonColor: Colors.indigoAccent[100]),
+                buildButton(
+                  index: 0,
+                  buttonColor: Colors.yellow[300],
+                  text: 'NORMAL',
+                ),
+                buildButton(
+                  index: 1,
+                  buttonColor: Colors.deepOrange[400],
+                  text: 'EFFECT',
+                ),
+                buildButton(
+                  index: 2,
+                  buttonColor: Colors.indigoAccent[100],
+                  text: 'RITUAL',
+                ),
               ],
             ),
             Row(
               children: [
-                buildButton(index: 3, buttonColor: Colors.deepPurple[400]),
-                buildButton(index: 4, buttonColor: Colors.white60),
-                buildButton(index: 5, buttonColor: Colors.black87),
+                buildButton(
+                  index: 3,
+                  buttonColor: Colors.deepPurple[400],
+                  text: 'FUSION',
+                ),
+                buildButton(
+                  index: 4,
+                  buttonColor: Colors.white60,
+                  text: 'SYNCHRO',
+                ),
+                buildButton(
+                  index: 5,
+                  buttonColor: Colors.black87,
+                  text: 'XYZ',
+                ),
               ],
             ),
             Row(
               children: [
-                buildButton(index: 6),
-                buildButton(index: 7, buttonColor: Colors.green[500]),
-                buildButton(index: 8, buttonColor: Colors.pink[700]),
+                buildButton(
+                  index: 6,
+                  text: 'PENDULUM',
+                ),
+                buildButton(
+                  index: 7,
+                  buttonColor: Colors.green[500],
+                  text: 'SPELL',
+                ),
+                buildButton(
+                  index: 8,
+                  buttonColor: Colors.pink[700],
+                  text: 'TRAP',
+                ),
               ],
             ),
             Row(
               children: [
-                buildButton(index: 9, buttonColor: Colors.blue[900]),
-                Expanded(flex: 2, child: Container()),
+                buildButton(
+                  index: 9,
+                  buttonColor: Colors.blue[900],
+                  text: 'LINK',
+                ),
+                buildUnselectButton(rangeLeft: 0, rangeRight: 9),
+                Expanded(flex: 1, child: Container()),
               ],
             ),
             Padding(
@@ -181,7 +272,150 @@ class _FilterPageState extends State<FilterPage> {
                   text: 'Divine',
                   image: 'assets/attr_divine.png',
                 ),
-                Expanded(flex: 2, child: Container()),
+                buildUnselectButton(rangeLeft: 10, rangeRight: 16),
+                Expanded(flex: 1, child: Container()),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.all(4),
+              child: Text('Monster types', style: TextStyle(fontSize: 20)),
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 17,
+                  text: filterList[17].name,
+                ),
+                buildButton(
+                  index: 18,
+                  text: filterList[18].name,
+                ),
+                buildButton(
+                  index: 19,
+                  text: filterList[19].name,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 20,
+                  text: filterList[20].name,
+                ),
+                buildButton(
+                  index: 21,
+                  text: filterList[21].name,
+                ),
+                buildButton(
+                  index: 22,
+                  text: filterList[22].name,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 23,
+                  text: filterList[23].name,
+                ),
+                buildButton(
+                  index: 24,
+                  text: filterList[24].name,
+                ),
+                buildButton(
+                  index: 25,
+                  text: filterList[25].name,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 26,
+                  text: filterList[26].name,
+                ),
+                buildButton(
+                  index: 27,
+                  text: filterList[27].name,
+                ),
+                buildButton(
+                  index: 28,
+                  text: filterList[28].name,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 29,
+                  text: filterList[29].name,
+                ),
+                buildButton(
+                  index: 30,
+                  text: filterList[30].name,
+                ),
+                buildButton(
+                  index: 31,
+                  text: filterList[31].name,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 32,
+                  text: filterList[32].name,
+                ),
+                buildButton(
+                  index: 33,
+                  text: filterList[33].name,
+                ),
+                buildButton(
+                  index: 34,
+                  text: filterList[34].name,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 35,
+                  text: filterList[35].name,
+                ),
+                buildButton(
+                  index: 36,
+                  text: filterList[36].name,
+                ),
+                buildButton(
+                  index: 37,
+                  text: filterList[37].name,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 38,
+                  text: filterList[38].name,
+                ),
+                buildButton(
+                  index: 39,
+                  text: filterList[39].name,
+                ),
+                buildButton(
+                  index: 40,
+                  text: filterList[40].name,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                buildButton(
+                  index: 41,
+                  text: filterList[41].name,
+                ),
+                buildUnselectButton(rangeLeft: 17, rangeRight: 41),
+                Expanded(flex: 1, child: Container()),
               ],
             ),
           ],

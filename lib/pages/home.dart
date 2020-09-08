@@ -47,8 +47,12 @@ class _HomeState extends State<Home> {
   }
 
   _onSelectItem(int index) {
-    setState(() => _selectedDrawerIndex = index);
-    Navigator.of(context).pop();
+    if (_selectedDrawerIndex == index) {
+      Navigator.of(context).pop();
+    } else {
+      setState(() => _selectedDrawerIndex = index);
+      Navigator.of(context).pop();
+    }
   }
 
   @override
