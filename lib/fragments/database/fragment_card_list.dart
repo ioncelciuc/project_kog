@@ -247,7 +247,6 @@ class _FragmentCardListState extends State<FragmentCardList>
       }
       setState(() {
         this.cardList = filterCardList(searchList);
-        //this.cardList = searchList;
       });
       return;
     }
@@ -274,8 +273,9 @@ class _FragmentCardListState extends State<FragmentCardList>
         if (filterList[i].selected == true) {
           if (filterList[i].name == 'Effect') {
             for (int j = 0; j < futureList.length; j++)
-              if (futureList[j].type.startsWith(filterList[i].name) ||
-                  futureList[j].type.startsWith('Tuner'))
+              if (!futureList[j]
+                  .type
+                  .contains('Normal')) //TODO: TEST FILTERING WITH EFFECT
                 cardListFiltered.add(futureList[j]);
           } else {
             for (int j = 0; j < futureList.length; j++)
@@ -304,26 +304,107 @@ class _FragmentCardListState extends State<FragmentCardList>
       }
     }
 
-    ///MONSTER TYPE
-    bool atLeastOneMonsterTypeOption = false;
-    for (int i = 17; i < 42 && atLeastOneMonsterTypeOption == false; i++)
-      if (filterList[i].selected == true) atLeastOneMonsterTypeOption = true;
-    if (atLeastOneMonsterTypeOption) {
+    ///MONSTER TYPE 1
+    bool atLeastOneMonsterType1Option = false;
+    for (int i = 17; i < 42 && atLeastOneMonsterType1Option == false; i++)
+      if (filterList[i].selected == true) atLeastOneMonsterType1Option = true;
+    if (atLeastOneMonsterType1Option) {
       if (cardListFiltered.length > 0) {
         futureList.clear();
         for (int i = 0; i < cardListFiltered.length; i++)
           futureList.add(cardListFiltered[i]);
         cardListFiltered.clear();
-        for (int i = 17; i < 42; i++) {
-          if (filterList[i].selected == true)
-            for (int j = 0; j < futureList.length; j++)
-              if (futureList[j].race == filterList[i].name)
-                cardListFiltered.add(futureList[j]);
-        }
+      }
+      for (int i = 17; i < 42; i++) {
+        if (filterList[i].selected == true)
+          for (int j = 0; j < futureList.length; j++)
+            if (futureList[j].race == filterList[i].name)
+              cardListFiltered.add(futureList[j]);
       }
     }
 
+    ///MONSTER TYPE 2
+    bool atLeastOneMonsterType2Option = false;
+    for (int i = 42; i < 48 && atLeastOneMonsterType2Option == false; i++)
+      if (filterList[i].selected == true) atLeastOneMonsterType2Option = true;
+    if (atLeastOneMonsterType2Option) {
+      if (cardListFiltered.length > 0) {
+        futureList.clear();
+        for (int i = 0; i < cardListFiltered.length; i++)
+          futureList.add(cardListFiltered[i]);
+        cardListFiltered.clear();
+      }
+      for (int i = 42; i < 48; i++) {
+        if (filterList[i].selected == true)
+          for (int j = 0; j < futureList.length; j++)
+            if (futureList[j].type.contains(filterList[i].name))
+              cardListFiltered.add(futureList[j]);
+      }
+    }
 
+    /// SPELL/TRAP TYPES
+    bool atLeastOneSpellTrapTypesOption = false;
+    for (int i = 48; i < 55 && atLeastOneSpellTrapTypesOption == false; i++)
+      if (filterList[i].selected == true) atLeastOneSpellTrapTypesOption = true;
+    if (atLeastOneSpellTrapTypesOption) {
+      if (cardListFiltered.length > 0) {
+        futureList.clear();
+        for (int i = 0; i < cardListFiltered.length; i++)
+          futureList.add(cardListFiltered[i]);
+        cardListFiltered.clear();
+      }
+      for (int i = 48; i < 55; i++) {
+        if (filterList[i].selected == true)
+          for (int j = 0; j < futureList.length; j++)
+            if (futureList[j].race == filterList[i].name)
+              cardListFiltered.add(futureList[j]);
+      }
+    }
+
+    /// LINK ARROWS
+    bool atLeastOneLinkArrowOption = false;
+    for (int i = 55; i < 63 && atLeastOneLinkArrowOption == false; i++)
+      if (filterList[i].selected == true) atLeastOneLinkArrowOption = true;
+    if (atLeastOneLinkArrowOption) {
+      if (cardListFiltered.length > 0) {
+        futureList.clear();
+        for (int i = 0; i < cardListFiltered.length; i++)
+          futureList.add(cardListFiltered[i]);
+        cardListFiltered.clear();
+      }
+      for (int i = 0; i < futureList.length; i++) {
+        bool goodToBeAdded = true;
+        for (int j = 55; j < 63 && goodToBeAdded == true; j++)
+          if (filterList[j].selected == true)
+            switch (filterList[j].name) {
+              case 'Top-Left':
+                if (futureList[i].linkTopLeft == 0) goodToBeAdded = false;
+                break;
+              case 'Top':
+                if (futureList[i].linkTop == 0) goodToBeAdded = false;
+                break;
+              case 'Top-Right':
+                if (futureList[i].linkTopRight == 0) goodToBeAdded = false;
+                break;
+              case 'Left':
+                if (futureList[i].linkLeft == 0) goodToBeAdded = false;
+                break;
+              case 'Right':
+                if (futureList[i].linkRight == 0) goodToBeAdded = false;
+                break;
+              case 'Bottom-Left':
+                if (futureList[i].linkBottomLeft == 0) goodToBeAdded = false;
+                break;
+              case 'Bottom':
+                if (futureList[i].linkBottom == 0) goodToBeAdded = false;
+                break;
+              case 'Bottom-Right':
+                if (futureList[i].linkBottomRight == 0) goodToBeAdded = false;
+                break;
+            }
+        if (goodToBeAdded == true) cardListFiltered.add(futureList[i]);
+      }
+    }
 
     //sort and return list
     cardListFiltered.sort((a, b) => a.name.compareTo(b.name));
@@ -373,8 +454,32 @@ class _FragmentCardListState extends State<FragmentCardList>
     filterList.add(Filter(name: 'Spellcaster'));
     filterList.add(Filter(name: 'Thunder'));
     filterList.add(Filter(name: 'Warrior'));
-    filterList.add(Filter(name: 'Winged-Beast'));
+    filterList.add(Filter(name: 'Winged Beast'));
     filterList.add(Filter(name: 'Wyrm'));
     filterList.add(Filter(name: 'Zombie'));
+    //monster types 2
+    filterList.add(Filter(name: 'Flip'));
+    filterList.add(Filter(name: 'Gemini'));
+    filterList.add(Filter(name: 'Spirit'));
+    filterList.add(Filter(name: 'Toon'));
+    filterList.add(Filter(name: 'Tuner'));
+    filterList.add(Filter(name: 'Union'));
+    // spell/trap
+    filterList.add(Filter(name: 'Normal'));
+    filterList.add(Filter(name: 'Continuous'));
+    filterList.add(Filter(name: 'Equip'));
+    filterList.add(Filter(name: 'Field'));
+    filterList.add(Filter(name: 'Quick-Play'));
+    filterList.add(Filter(name: 'Ritual'));
+    filterList.add(Filter(name: 'Counter'));
+    //link arrows
+    filterList.add(Filter(name: 'Top-Left'));
+    filterList.add(Filter(name: 'Top'));
+    filterList.add(Filter(name: 'Top-Right'));
+    filterList.add(Filter(name: 'Left'));
+    filterList.add(Filter(name: 'Right'));
+    filterList.add(Filter(name: 'Bottom-Left'));
+    filterList.add(Filter(name: 'Bottom'));
+    filterList.add(Filter(name: 'Bottom-Right'));
   }
 }

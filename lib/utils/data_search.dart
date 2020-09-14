@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/database/fragment_archetypes.dart';
 import 'package:project_kog/fragments/database/fragment_card_list.dart';
 import 'package:project_kog/utils/card_list_type.dart';
