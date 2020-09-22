@@ -4,6 +4,7 @@ import 'package:marquee_widget/marquee_widget.dart';
 import 'package:project_kog/models/card.dart';
 import 'package:project_kog/models/deck.dart';
 import 'package:project_kog/models/filter.dart';
+import 'package:project_kog/models/filter_result.dart';
 import 'package:project_kog/pages/card_detail.dart';
 import 'package:project_kog/pages/filter_page.dart';
 import 'package:project_kog/utils/card_list_type.dart';
@@ -52,7 +53,7 @@ class _FragmentCardListState extends State<FragmentCardList>
 
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
   List<YuGiOhCard> cardList = List<YuGiOhCard>();
-  List<Filter> filterList = List<Filter>();
+  FilterResult filters = FilterResult();
 
   @override
   void initState() {
@@ -157,17 +158,27 @@ class _FragmentCardListState extends State<FragmentCardList>
         ),
         backgroundColor: Theme.of(context).primaryColor,
         onPressed: () async {
-          List<Filter> filterListParam = filterList;
-          final List<Filter> result = await Navigator.push(
+          FilterResult filtersParam = filters;
+          final FilterResult result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => FilterPage(filterList: filterListParam),
+              builder: (context) => FilterPage(filters: filtersParam),
             ),
           );
           setState(() {
-            for (int i = 0; i < result.length; i++) {
-              filterList[i].selected = result[i].selected;
+            for (int i = 0; i < result.filterList.length; i++) {
+              filters.filterList[i].selected = result.filterList[i].selected;
             }
+            filters.currentMinAtkSliderValue = result.currentMinAtkSliderValue;
+            filters.currentMaxAtkSliderValue = result.currentMaxAtkSliderValue;
+            filters.currentMinDefSliderValue = result.currentMinDefSliderValue;
+            filters.currentMaxDefSliderValue = result.currentMaxDefSliderValue;
+            filters.currentMinLvlSliderValue = result.currentMinLvlSliderValue;
+            filters.currentMaxLvlSliderValue = result.currentMaxLvlSliderValue;
+            filters.currentMinScaleSliderValue = result.currentMinScaleSliderValue;
+            filters.currentMaxScaleSliderValue = result.currentMaxScaleSliderValue;
+            filters.currentMinLinkSliderValue = result.currentMinLinkSliderValue;
+            filters.currentMaxLinkSliderValue = result.currentMaxLinkSliderValue;
           });
           getAllCardsFromDatabase();
         },
@@ -258,8 +269,9 @@ class _FragmentCardListState extends State<FragmentCardList>
 
   List<YuGiOhCard> filterCardList(List<YuGiOhCard> futureList) {
     bool atLeastAnOption = false;
-    for (int i = 0; i < filterList.length && atLeastAnOption == false; i++)
-      if (filterList[i].selected == true) atLeastAnOption = true;
+    for (int i = 0;
+        i < filters.filterList.length && atLeastAnOption == false;
+        i++) if (filters.filterList[i].selected == true) atLeastAnOption = true;
     if (atLeastAnOption == false) return futureList;
 
     List<YuGiOhCard> cardListFiltered = List<YuGiOhCard>();
@@ -267,11 +279,12 @@ class _FragmentCardListState extends State<FragmentCardList>
     ///CARD TYPES
     bool atLeastOneCardTypeOption = false;
     for (int i = 0; i < 10 && atLeastOneCardTypeOption == false; i++)
-      if (filterList[i].selected == true) atLeastOneCardTypeOption = true;
+      if (filters.filterList[i].selected == true)
+        atLeastOneCardTypeOption = true;
     if (atLeastOneCardTypeOption) {
       for (int i = 0; i < 10; i++)
-        if (filterList[i].selected == true) {
-          if (filterList[i].name == 'Effect') {
+        if (filters.filterList[i].selected == true) {
+          if (filters.filterList[i].name == 'Effect') {
             for (int j = 0; j < futureList.length; j++)
               if (!futureList[j]
                   .type
@@ -279,7 +292,7 @@ class _FragmentCardListState extends State<FragmentCardList>
                 cardListFiltered.add(futureList[j]);
           } else {
             for (int j = 0; j < futureList.length; j++)
-              if (futureList[j].type.startsWith(filterList[i].name))
+              if (futureList[j].type.startsWith(filters.filterList[i].name))
                 cardListFiltered.add(futureList[j]);
           }
         }
@@ -288,7 +301,8 @@ class _FragmentCardListState extends State<FragmentCardList>
     ///ATTRIBUTES
     bool atLeastAnAttributeOption = false;
     for (int i = 10; i < 17 && atLeastAnAttributeOption == false; i++)
-      if (filterList[i].selected == true) atLeastAnAttributeOption = true;
+      if (filters.filterList[i].selected == true)
+        atLeastAnAttributeOption = true;
     if (atLeastAnAttributeOption) {
       if (cardListFiltered.length > 0) {
         futureList.clear();
@@ -297,9 +311,9 @@ class _FragmentCardListState extends State<FragmentCardList>
         cardListFiltered.clear();
       }
       for (int i = 10; i < 17; i++) {
-        if (filterList[i].selected == true)
+        if (filters.filterList[i].selected == true)
           for (int j = 0; j < futureList.length; j++)
-            if (futureList[j].attribute == filterList[i].name)
+            if (futureList[j].attribute == filters.filterList[i].name)
               cardListFiltered.add(futureList[j]);
       }
     }
@@ -307,7 +321,8 @@ class _FragmentCardListState extends State<FragmentCardList>
     ///MONSTER TYPE 1
     bool atLeastOneMonsterType1Option = false;
     for (int i = 17; i < 42 && atLeastOneMonsterType1Option == false; i++)
-      if (filterList[i].selected == true) atLeastOneMonsterType1Option = true;
+      if (filters.filterList[i].selected == true)
+        atLeastOneMonsterType1Option = true;
     if (atLeastOneMonsterType1Option) {
       if (cardListFiltered.length > 0) {
         futureList.clear();
@@ -316,9 +331,9 @@ class _FragmentCardListState extends State<FragmentCardList>
         cardListFiltered.clear();
       }
       for (int i = 17; i < 42; i++) {
-        if (filterList[i].selected == true)
+        if (filters.filterList[i].selected == true)
           for (int j = 0; j < futureList.length; j++)
-            if (futureList[j].race == filterList[i].name)
+            if (futureList[j].race == filters.filterList[i].name)
               cardListFiltered.add(futureList[j]);
       }
     }
@@ -326,7 +341,8 @@ class _FragmentCardListState extends State<FragmentCardList>
     ///MONSTER TYPE 2
     bool atLeastOneMonsterType2Option = false;
     for (int i = 42; i < 48 && atLeastOneMonsterType2Option == false; i++)
-      if (filterList[i].selected == true) atLeastOneMonsterType2Option = true;
+      if (filters.filterList[i].selected == true)
+        atLeastOneMonsterType2Option = true;
     if (atLeastOneMonsterType2Option) {
       if (cardListFiltered.length > 0) {
         futureList.clear();
@@ -335,9 +351,9 @@ class _FragmentCardListState extends State<FragmentCardList>
         cardListFiltered.clear();
       }
       for (int i = 42; i < 48; i++) {
-        if (filterList[i].selected == true)
+        if (filters.filterList[i].selected == true)
           for (int j = 0; j < futureList.length; j++)
-            if (futureList[j].type.contains(filterList[i].name))
+            if (futureList[j].type.contains(filters.filterList[i].name))
               cardListFiltered.add(futureList[j]);
       }
     }
@@ -345,7 +361,8 @@ class _FragmentCardListState extends State<FragmentCardList>
     /// SPELL/TRAP TYPES
     bool atLeastOneSpellTrapTypesOption = false;
     for (int i = 48; i < 55 && atLeastOneSpellTrapTypesOption == false; i++)
-      if (filterList[i].selected == true) atLeastOneSpellTrapTypesOption = true;
+      if (filters.filterList[i].selected == true)
+        atLeastOneSpellTrapTypesOption = true;
     if (atLeastOneSpellTrapTypesOption) {
       if (cardListFiltered.length > 0) {
         futureList.clear();
@@ -354,9 +371,9 @@ class _FragmentCardListState extends State<FragmentCardList>
         cardListFiltered.clear();
       }
       for (int i = 48; i < 55; i++) {
-        if (filterList[i].selected == true)
+        if (filters.filterList[i].selected == true)
           for (int j = 0; j < futureList.length; j++)
-            if (futureList[j].race == filterList[i].name)
+            if (futureList[j].race == filters.filterList[i].name)
               cardListFiltered.add(futureList[j]);
       }
     }
@@ -364,7 +381,8 @@ class _FragmentCardListState extends State<FragmentCardList>
     /// LINK ARROWS
     bool atLeastOneLinkArrowOption = false;
     for (int i = 55; i < 63 && atLeastOneLinkArrowOption == false; i++)
-      if (filterList[i].selected == true) atLeastOneLinkArrowOption = true;
+      if (filters.filterList[i].selected == true)
+        atLeastOneLinkArrowOption = true;
     if (atLeastOneLinkArrowOption) {
       if (cardListFiltered.length > 0) {
         futureList.clear();
@@ -375,8 +393,8 @@ class _FragmentCardListState extends State<FragmentCardList>
       for (int i = 0; i < futureList.length; i++) {
         bool goodToBeAdded = true;
         for (int j = 55; j < 63 && goodToBeAdded == true; j++)
-          if (filterList[j].selected == true)
-            switch (filterList[j].name) {
+          if (filters.filterList[j].selected == true)
+            switch (filters.filterList[j].name) {
               case 'Top-Left':
                 if (futureList[i].linkTopLeft == 0) goodToBeAdded = false;
                 break;
@@ -406,6 +424,9 @@ class _FragmentCardListState extends State<FragmentCardList>
       }
     }
 
+    ///ATK
+    
+
     //sort and return list
     cardListFiltered.sort((a, b) => a.name.compareTo(b.name));
     return cardListFiltered;
@@ -413,73 +434,84 @@ class _FragmentCardListState extends State<FragmentCardList>
 
   void initializareTractor() {
     //card types
-    filterList.add(Filter(name: 'Normal'));
-    filterList.add(Filter(name: 'Effect'));
-    filterList.add(Filter(name: 'Ritual'));
-    filterList.add(Filter(name: 'Fusion'));
-    filterList.add(Filter(name: 'Synchro'));
-    filterList.add(Filter(name: 'XYZ'));
-    filterList.add(Filter(name: 'Pendulum'));
-    filterList.add(Filter(name: 'Spell'));
-    filterList.add(Filter(name: 'Trap'));
-    filterList.add(Filter(name: 'Link'));
+    filters.filterList.add(Filter(name: 'Normal'));
+    filters.filterList.add(Filter(name: 'Effect'));
+    filters.filterList.add(Filter(name: 'Ritual'));
+    filters.filterList.add(Filter(name: 'Fusion'));
+    filters.filterList.add(Filter(name: 'Synchro'));
+    filters.filterList.add(Filter(name: 'XYZ'));
+    filters.filterList.add(Filter(name: 'Pendulum'));
+    filters.filterList.add(Filter(name: 'Spell'));
+    filters.filterList.add(Filter(name: 'Trap'));
+    filters.filterList.add(Filter(name: 'Link'));
     //attributes
-    filterList.add(Filter(name: 'DARK'));
-    filterList.add(Filter(name: 'EARTH'));
-    filterList.add(Filter(name: 'FIRE'));
-    filterList.add(Filter(name: 'LIGHT'));
-    filterList.add(Filter(name: 'WATER'));
-    filterList.add(Filter(name: 'WIND'));
-    filterList.add(Filter(name: 'DIVINE'));
+    filters.filterList.add(Filter(name: 'DARK'));
+    filters.filterList.add(Filter(name: 'EARTH'));
+    filters.filterList.add(Filter(name: 'FIRE'));
+    filters.filterList.add(Filter(name: 'LIGHT'));
+    filters.filterList.add(Filter(name: 'WATER'));
+    filters.filterList.add(Filter(name: 'WIND'));
+    filters.filterList.add(Filter(name: 'DIVINE'));
     //monster types
-    filterList.add(Filter(name: 'Aqua'));
-    filterList.add(Filter(name: 'Beast'));
-    filterList.add(Filter(name: 'Beast-Warrior'));
-    filterList.add(Filter(name: 'Creator-God'));
-    filterList.add(Filter(name: 'Cyberse'));
-    filterList.add(Filter(name: 'Dinosaur'));
-    filterList.add(Filter(name: 'Divine-Beast'));
-    filterList.add(Filter(name: 'Dragon'));
-    filterList.add(Filter(name: 'Fairy'));
-    filterList.add(Filter(name: 'Fiend'));
-    filterList.add(Filter(name: 'Fish'));
-    filterList.add(Filter(name: 'Insect'));
-    filterList.add(Filter(name: 'Machine'));
-    filterList.add(Filter(name: 'Plant'));
-    filterList.add(Filter(name: 'Psychic'));
-    filterList.add(Filter(name: 'Pyro'));
-    filterList.add(Filter(name: 'Reptile'));
-    filterList.add(Filter(name: 'Rock'));
-    filterList.add(Filter(name: 'Sea Serpent'));
-    filterList.add(Filter(name: 'Spellcaster'));
-    filterList.add(Filter(name: 'Thunder'));
-    filterList.add(Filter(name: 'Warrior'));
-    filterList.add(Filter(name: 'Winged Beast'));
-    filterList.add(Filter(name: 'Wyrm'));
-    filterList.add(Filter(name: 'Zombie'));
+    filters.filterList.add(Filter(name: 'Aqua'));
+    filters.filterList.add(Filter(name: 'Beast'));
+    filters.filterList.add(Filter(name: 'Beast-Warrior'));
+    filters.filterList.add(Filter(name: 'Creator-God'));
+    filters.filterList.add(Filter(name: 'Cyberse'));
+    filters.filterList.add(Filter(name: 'Dinosaur'));
+    filters.filterList.add(Filter(name: 'Divine-Beast'));
+    filters.filterList.add(Filter(name: 'Dragon'));
+    filters.filterList.add(Filter(name: 'Fairy'));
+    filters.filterList.add(Filter(name: 'Fiend'));
+    filters.filterList.add(Filter(name: 'Fish'));
+    filters.filterList.add(Filter(name: 'Insect'));
+    filters.filterList.add(Filter(name: 'Machine'));
+    filters.filterList.add(Filter(name: 'Plant'));
+    filters.filterList.add(Filter(name: 'Psychic'));
+    filters.filterList.add(Filter(name: 'Pyro'));
+    filters.filterList.add(Filter(name: 'Reptile'));
+    filters.filterList.add(Filter(name: 'Rock'));
+    filters.filterList.add(Filter(name: 'Sea Serpent'));
+    filters.filterList.add(Filter(name: 'Spellcaster'));
+    filters.filterList.add(Filter(name: 'Thunder'));
+    filters.filterList.add(Filter(name: 'Warrior'));
+    filters.filterList.add(Filter(name: 'Winged Beast'));
+    filters.filterList.add(Filter(name: 'Wyrm'));
+    filters.filterList.add(Filter(name: 'Zombie'));
     //monster types 2
-    filterList.add(Filter(name: 'Flip'));
-    filterList.add(Filter(name: 'Gemini'));
-    filterList.add(Filter(name: 'Spirit'));
-    filterList.add(Filter(name: 'Toon'));
-    filterList.add(Filter(name: 'Tuner'));
-    filterList.add(Filter(name: 'Union'));
+    filters.filterList.add(Filter(name: 'Flip'));
+    filters.filterList.add(Filter(name: 'Gemini'));
+    filters.filterList.add(Filter(name: 'Spirit'));
+    filters.filterList.add(Filter(name: 'Toon'));
+    filters.filterList.add(Filter(name: 'Tuner'));
+    filters.filterList.add(Filter(name: 'Union'));
     // spell/trap
-    filterList.add(Filter(name: 'Normal'));
-    filterList.add(Filter(name: 'Continuous'));
-    filterList.add(Filter(name: 'Equip'));
-    filterList.add(Filter(name: 'Field'));
-    filterList.add(Filter(name: 'Quick-Play'));
-    filterList.add(Filter(name: 'Ritual'));
-    filterList.add(Filter(name: 'Counter'));
+    filters.filterList.add(Filter(name: 'Normal'));
+    filters.filterList.add(Filter(name: 'Continuous'));
+    filters.filterList.add(Filter(name: 'Equip'));
+    filters.filterList.add(Filter(name: 'Field'));
+    filters.filterList.add(Filter(name: 'Quick-Play'));
+    filters.filterList.add(Filter(name: 'Ritual'));
+    filters.filterList.add(Filter(name: 'Counter'));
     //link arrows
-    filterList.add(Filter(name: 'Top-Left'));
-    filterList.add(Filter(name: 'Top'));
-    filterList.add(Filter(name: 'Top-Right'));
-    filterList.add(Filter(name: 'Left'));
-    filterList.add(Filter(name: 'Right'));
-    filterList.add(Filter(name: 'Bottom-Left'));
-    filterList.add(Filter(name: 'Bottom'));
-    filterList.add(Filter(name: 'Bottom-Right'));
+    filters.filterList.add(Filter(name: 'Top-Left'));
+    filters.filterList.add(Filter(name: 'Top'));
+    filters.filterList.add(Filter(name: 'Top-Right'));
+    filters.filterList.add(Filter(name: 'Left'));
+    filters.filterList.add(Filter(name: 'Right'));
+    filters.filterList.add(Filter(name: 'Bottom-Left'));
+    filters.filterList.add(Filter(name: 'Bottom'));
+    filters.filterList.add(Filter(name: 'Bottom-Right'));
+    // atk/def/lvl/scale
+    filters.currentMinAtkSliderValue = 0;
+    filters.currentMaxAtkSliderValue = 5000;
+    filters.currentMinDefSliderValue = 0;
+    filters.currentMaxDefSliderValue = 5000;
+    filters.currentMinLvlSliderValue = 0;
+    filters.currentMaxLvlSliderValue = 12;
+    filters.currentMinScaleSliderValue = 0;
+    filters.currentMaxScaleSliderValue = 12;
+    filters.currentMinLinkSliderValue = 0;
+    filters.currentMaxLinkSliderValue = 6;
   }
 }

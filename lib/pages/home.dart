@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kog/fragments/home/fragment_dashboard.dart';
 import 'package:project_kog/fragments/home/fragment_decks.dart';
-import 'file:///C:/Users/Ionut-Tiberiu/AndroidStudioProjects/FlutterApps/project_kog/lib/fragments/home/fragment_calculator.dart';
+import 'package:project_kog/fragments/home/fragment_calculator.dart';
 import 'package:project_kog/fragments/home/fragment_favourites.dart';
 import 'package:project_kog/pages/settings.dart';
 

@@ -3,21 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:project_kog/models/filter.dart';
 import 'dart:math' as math;
 
-class FilterPage extends StatefulWidget {
-  final List<Filter> filterList;
+import 'package:project_kog/models/filter_result.dart';
 
-  FilterPage({this.filterList});
+class FilterPage extends StatefulWidget {
+  final FilterResult filters;
+
+  FilterPage({this.filters});
 
   @override
   _FilterPageState createState() =>
-      _FilterPageState(filterList: this.filterList);
+      _FilterPageState(filters: this.filters);
 }
 
 class _FilterPageState extends State<FilterPage> {
-  List<Filter> filterList;
-  final List<Filter> initialFilterList = new List<Filter>();
 
-  _FilterPageState({this.filterList});
+  FilterResult filters;
+
+  _FilterPageState({this.filters});
+
+  FilterResult initialFilters;
 
   Widget buildButton(
       {int index, String text, Color buttonColor, String image}) {
@@ -29,7 +33,7 @@ class _FilterPageState extends State<FilterPage> {
           color: buttonColor != null ? buttonColor : null,
           onPressed: () {
             setState(() {
-              filterList[index].selected = !filterList[index].selected;
+              filters.filterList[index].selected = !filters.filterList[index].selected;
             });
           },
           padding: EdgeInsets.all(index == 6 || index == 48 || index == 49
@@ -82,7 +86,7 @@ class _FilterPageState extends State<FilterPage> {
                 ),
           shape: RoundedRectangleBorder(
             side: BorderSide(
-              color: filterList[index].selected == true
+              color: filters.filterList[index].selected == true
                   ? Theme.of(context).primaryColorDark
                   : Colors.grey,
               width: 2,
@@ -104,7 +108,7 @@ class _FilterPageState extends State<FilterPage> {
           borderRadius: BorderRadius.circular(90),
           border: Border.all(
               width: 5,
-              color: filterList[index].selected
+              color: filters.filterList[index].selected
                   ? Theme.of(context).primaryColor
                   : Colors.grey)),
       child: ClipRRect(
@@ -114,7 +118,7 @@ class _FilterPageState extends State<FilterPage> {
           color: Colors.white,
           onPressed: () {
             setState(() {
-              filterList[index].selected = !filterList[index].selected;
+              filters.filterList[index].selected = !filters.filterList[index].selected;
             });
           },
           child: Transform.rotate(
@@ -139,7 +143,7 @@ class _FilterPageState extends State<FilterPage> {
           onPressed: () {
             setState(() {
               for (int i = rangeLeft; i <= rangeRight; i++)
-                filterList[i].selected = false;
+                filters.filterList[i].selected = false;
             });
           },
           shape: RoundedRectangleBorder(
@@ -161,10 +165,31 @@ class _FilterPageState extends State<FilterPage> {
 
   @override
   void initState() {
-    for (int i = 0; i < filterList.length; i++) {
-      initialFilterList.add(new Filter(name: filterList[i].name));
-      initialFilterList[i].selected = filterList[i].selected;
+    initialFilters = new FilterResult();
+    for (int i = 0; i < filters.filterList.length; i++) {
+      initialFilters.filterList.add(new Filter(name: filters.filterList[i].name));
+      initialFilters.filterList[i].selected = filters.filterList[i].selected;
     }
+    double minAtk = filters.currentMinAtkSliderValue;
+    double maxAtk = filters.currentMaxAtkSliderValue;
+    initialFilters.currentMinAtkSliderValue = minAtk;
+    initialFilters.currentMaxAtkSliderValue = maxAtk;
+    double minDef = filters.currentMinDefSliderValue;
+    double maxDef = filters.currentMaxDefSliderValue;
+    initialFilters.currentMinDefSliderValue = minDef;
+    initialFilters.currentMaxDefSliderValue = maxDef;
+    double minLvl = filters.currentMinLvlSliderValue;
+    double maxLvl = filters.currentMaxLvlSliderValue;
+    initialFilters.currentMinLvlSliderValue = minLvl;
+    initialFilters.currentMaxLvlSliderValue = maxLvl;
+    double minScale = filters.currentMinScaleSliderValue;
+    double maxScale = filters.currentMaxScaleSliderValue;
+    initialFilters.currentMinScaleSliderValue = minScale;
+    initialFilters.currentMaxScaleSliderValue = maxScale;
+    double minLink = filters.currentMinLinkSliderValue;
+    double maxLink = filters.currentMaxLinkSliderValue;
+    initialFilters.currentMinLinkSliderValue = minLink;
+    initialFilters.currentMaxLinkSliderValue = maxLink;
     super.initState();
   }
 
@@ -172,7 +197,7 @@ class _FilterPageState extends State<FilterPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        Navigator.pop(context, initialFilterList);
+        Navigator.pop(context, initialFilters);
         return;
       },
       child: Scaffold(
@@ -182,7 +207,7 @@ class _FilterPageState extends State<FilterPage> {
             IconButton(
               icon: Icon(Icons.check),
               onPressed: () {
-                Navigator.pop(context, filterList);
+                Navigator.pop(context, filters);
               },
             ),
           ],
@@ -268,17 +293,17 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 10,
-                  text: filterList[10].name,
+                  text: filters.filterList[10].name,
                   image: 'assets/attr_dark.png',
                 ),
                 buildButton(
                   index: 11,
-                  text: filterList[11].name,
+                  text: filters.filterList[11].name,
                   image: 'assets/attr_earth.png',
                 ),
                 buildButton(
                   index: 12,
-                  text: filterList[12].name,
+                  text: filters.filterList[12].name,
                   image: 'assets/attr_fire.png',
                 ),
               ],
@@ -287,17 +312,17 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 13,
-                  text: filterList[13].name,
+                  text: filters.filterList[13].name,
                   image: 'assets/attr_light.png',
                 ),
                 buildButton(
                   index: 14,
-                  text: filterList[14].name,
+                  text: filters.filterList[14].name,
                   image: 'assets/attr_water.png',
                 ),
                 buildButton(
                   index: 15,
-                  text: filterList[15].name,
+                  text: filters.filterList[15].name,
                   image: 'assets/attr_wind.png',
                 ),
               ],
@@ -306,7 +331,7 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 16,
-                  text: filterList[16].name,
+                  text: filters.filterList[16].name,
                   image: 'assets/attr_divine.png',
                 ),
                 buildUnselectButton(rangeLeft: 10, rangeRight: 16),
@@ -321,15 +346,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 17,
-                  text: filterList[17].name,
+                  text: filters.filterList[17].name,
                 ),
                 buildButton(
                   index: 18,
-                  text: filterList[18].name,
+                  text: filters.filterList[18].name,
                 ),
                 buildButton(
                   index: 19,
-                  text: filterList[19].name,
+                  text: filters.filterList[19].name,
                 ),
               ],
             ),
@@ -337,15 +362,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 20,
-                  text: filterList[20].name,
+                  text: filters.filterList[20].name,
                 ),
                 buildButton(
                   index: 21,
-                  text: filterList[21].name,
+                  text: filters.filterList[21].name,
                 ),
                 buildButton(
                   index: 22,
-                  text: filterList[22].name,
+                  text: filters.filterList[22].name,
                 ),
               ],
             ),
@@ -353,15 +378,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 23,
-                  text: filterList[23].name,
+                  text: filters.filterList[23].name,
                 ),
                 buildButton(
                   index: 24,
-                  text: filterList[24].name,
+                  text: filters.filterList[24].name,
                 ),
                 buildButton(
                   index: 25,
-                  text: filterList[25].name,
+                  text: filters.filterList[25].name,
                 ),
               ],
             ),
@@ -369,15 +394,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 26,
-                  text: filterList[26].name,
+                  text: filters.filterList[26].name,
                 ),
                 buildButton(
                   index: 27,
-                  text: filterList[27].name,
+                  text: filters.filterList[27].name,
                 ),
                 buildButton(
                   index: 28,
-                  text: filterList[28].name,
+                  text: filters.filterList[28].name,
                 ),
               ],
             ),
@@ -385,15 +410,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 29,
-                  text: filterList[29].name,
+                  text: filters.filterList[29].name,
                 ),
                 buildButton(
                   index: 30,
-                  text: filterList[30].name,
+                  text: filters.filterList[30].name,
                 ),
                 buildButton(
                   index: 31,
-                  text: filterList[31].name,
+                  text: filters.filterList[31].name,
                 ),
               ],
             ),
@@ -401,15 +426,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 32,
-                  text: filterList[32].name,
+                  text: filters.filterList[32].name,
                 ),
                 buildButton(
                   index: 33,
-                  text: filterList[33].name,
+                  text: filters.filterList[33].name,
                 ),
                 buildButton(
                   index: 34,
-                  text: filterList[34].name,
+                  text: filters.filterList[34].name,
                 ),
               ],
             ),
@@ -417,15 +442,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 35,
-                  text: filterList[35].name,
+                  text: filters.filterList[35].name,
                 ),
                 buildButton(
                   index: 36,
-                  text: filterList[36].name,
+                  text: filters.filterList[36].name,
                 ),
                 buildButton(
                   index: 37,
-                  text: filterList[37].name,
+                  text: filters.filterList[37].name,
                 ),
               ],
             ),
@@ -433,15 +458,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 38,
-                  text: filterList[38].name,
+                  text: filters.filterList[38].name,
                 ),
                 buildButton(
                   index: 39,
-                  text: filterList[39].name,
+                  text: filters.filterList[39].name,
                 ),
                 buildButton(
                   index: 40,
-                  text: filterList[40].name,
+                  text: filters.filterList[40].name,
                 ),
               ],
             ),
@@ -449,7 +474,7 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 41,
-                  text: filterList[41].name,
+                  text: filters.filterList[41].name,
                 ),
                 buildUnselectButton(rangeLeft: 17, rangeRight: 41),
                 Expanded(flex: 1, child: Container()),
@@ -463,15 +488,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 42,
-                  text: filterList[42].name,
+                  text: filters.filterList[42].name,
                 ),
                 buildButton(
                   index: 43,
-                  text: filterList[43].name,
+                  text: filters.filterList[43].name,
                 ),
                 buildButton(
                   index: 44,
-                  text: filterList[44].name,
+                  text: filters.filterList[44].name,
                 ),
               ],
             ),
@@ -479,15 +504,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 45,
-                  text: filterList[45].name,
+                  text: filters.filterList[45].name,
                 ),
                 buildButton(
                   index: 46,
-                  text: filterList[46].name,
+                  text: filters.filterList[46].name,
                 ),
                 buildButton(
                   index: 47,
-                  text: filterList[47].name,
+                  text: filters.filterList[47].name,
                 ),
               ],
             ),
@@ -505,15 +530,15 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 48,
-                  text: filterList[48].name,
+                  text: filters.filterList[48].name,
                 ),
                 buildButton(
                   index: 49,
-                  text: filterList[49].name,
+                  text: filters.filterList[49].name,
                 ),
                 buildButton(
                   index: 50,
-                  text: filterList[50].name,
+                  text: filters.filterList[50].name,
                   buttonColor: Colors.green[500],
                 ),
               ],
@@ -522,17 +547,17 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 51,
-                  text: filterList[51].name,
+                  text: filters.filterList[51].name,
                   buttonColor: Colors.green[500],
                 ),
                 buildButton(
                   index: 52,
-                  text: filterList[52].name,
+                  text: filters.filterList[52].name,
                   buttonColor: Colors.green[500],
                 ),
                 buildButton(
                   index: 53,
-                  text: filterList[53].name,
+                  text: filters.filterList[53].name,
                   buttonColor: Colors.green[500],
                 ),
               ],
@@ -541,12 +566,167 @@ class _FilterPageState extends State<FilterPage> {
               children: [
                 buildButton(
                   index: 54,
-                  text: filterList[54].name,
+                  text: filters.filterList[54].name,
                   buttonColor: Colors.pink[700],
                 ),
                 buildUnselectButton(rangeLeft: 48, rangeRight: 54),
                 Expanded(flex: 1, child: Container()),
               ],
+            ),
+            Padding(
+              padding: EdgeInsets.all(4),
+              child: Text('ATTACK', style: TextStyle(fontSize: 20)),
+            ),
+            RangeSlider(
+              onChanged: (RangeValues value) {
+                setState(() {
+                  filters.currentMinAtkSliderValue = value.start;
+                  filters.currentMaxAtkSliderValue = value.end;
+                });
+              },
+              values: RangeValues(
+                  filters.currentMinAtkSliderValue, filters.currentMaxAtkSliderValue),
+              onChangeStart: (RangeValues value) {
+                setState(() {
+                  filters.currentMinAtkSliderValue = value.start;
+                });
+              },
+              onChangeEnd: (RangeValues value) {
+                setState(() {
+                  filters.currentMaxAtkSliderValue = value.end;
+                });
+              },
+              min: 0,
+              max: 5000,
+              divisions: 50,
+              labels: RangeLabels(
+                filters.currentMinAtkSliderValue.toStringAsFixed(0),
+                filters.currentMaxAtkSliderValue.toStringAsFixed(0),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(4),
+              child: Text('DEFENCE', style: TextStyle(fontSize: 20)),
+            ),
+            RangeSlider(
+              onChanged: (RangeValues value) {
+                setState(() {
+                  filters.currentMinDefSliderValue = value.start;
+                  filters.currentMaxDefSliderValue = value.end;
+                });
+              },
+              values: RangeValues(
+                  filters.currentMinDefSliderValue, filters.currentMaxDefSliderValue),
+              onChangeStart: (RangeValues value) {
+                setState(() {
+                  filters.currentMinDefSliderValue = value.start;
+                });
+              },
+              onChangeEnd: (RangeValues value) {
+                setState(() {
+                  filters.currentMaxDefSliderValue = value.end;
+                });
+              },
+              min: 0,
+              max: 5000,
+              divisions: 50,
+              labels: RangeLabels(
+                filters.currentMinDefSliderValue.toStringAsFixed(0),
+                filters.currentMaxDefSliderValue.toStringAsFixed(0),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(4),
+              child: Text('LEVEL/RANK', style: TextStyle(fontSize: 20)),
+            ),
+            RangeSlider(
+              onChanged: (RangeValues value) {
+                setState(() {
+                  filters.currentMinLvlSliderValue = value.start;
+                  filters.currentMaxLvlSliderValue = value.end;
+                });
+              },
+              values: RangeValues(
+                  filters.currentMinLvlSliderValue, filters.currentMaxLvlSliderValue),
+              onChangeStart: (RangeValues value) {
+                setState(() {
+                  filters.currentMinLvlSliderValue = value.start;
+                });
+              },
+              onChangeEnd: (RangeValues value) {
+                setState(() {
+                  filters.currentMaxLvlSliderValue = value.end;
+                });
+              },
+              min: 0,
+              max: 12,
+              divisions: 12,
+              labels: RangeLabels(
+                filters.currentMinLvlSliderValue.toStringAsFixed(0),
+                filters.currentMaxLvlSliderValue.toStringAsFixed(0),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(4),
+              child: Text('SCALE', style: TextStyle(fontSize: 20)),
+            ),
+            RangeSlider(
+              onChanged: (RangeValues value) {
+                setState(() {
+                  filters.currentMinScaleSliderValue = value.start;
+                  filters.currentMaxScaleSliderValue = value.end;
+                });
+              },
+              values: RangeValues(
+                  filters.currentMinScaleSliderValue, filters.currentMaxScaleSliderValue),
+              onChangeStart: (RangeValues value) {
+                setState(() {
+                  filters.currentMinScaleSliderValue = value.start;
+                });
+              },
+              onChangeEnd: (RangeValues value) {
+                setState(() {
+                  filters.currentMaxScaleSliderValue = value.end;
+                });
+              },
+              min: 0,
+              max: 12,
+              divisions: 12,
+              labels: RangeLabels(
+                filters.currentMinScaleSliderValue.toStringAsFixed(0),
+                filters.currentMaxScaleSliderValue.toStringAsFixed(0),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(4),
+              child: Text('LINK', style: TextStyle(fontSize: 20)),
+            ),
+            RangeSlider(
+              onChanged: (RangeValues value) {
+                setState(() {
+                  filters.currentMinLinkSliderValue = value.start;
+                  filters.currentMaxLinkSliderValue = value.end;
+                });
+              },
+              values: RangeValues(
+                  filters.currentMinLinkSliderValue, filters.currentMaxLinkSliderValue),
+              onChangeStart: (RangeValues value) {
+                setState(() {
+                  filters.currentMinLinkSliderValue = value.start;
+                });
+              },
+              onChangeEnd: (RangeValues value) {
+                setState(() {
+                  filters.currentMaxLinkSliderValue = value.end;
+                });
+              },
+              min: 0,
+              max: 6,
+              divisions: 6,
+              labels: RangeLabels(
+                filters.currentMinLinkSliderValue.toStringAsFixed(0),
+                filters.currentMaxLinkSliderValue.toStringAsFixed(0),
+              ),
             ),
             Padding(
               padding: EdgeInsets.all(4),
@@ -577,7 +757,7 @@ class _FilterPageState extends State<FilterPage> {
                       onPressed: () {
                         setState(() {
                           for (int i = 55; i < 63; i++)
-                            filterList[i].selected = false;
+                            filters.filterList[i].selected = false;
                         });
                       },
                       child: Icon(
